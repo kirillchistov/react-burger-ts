@@ -43,7 +43,7 @@
 @media (width <= 1259px) {
   .footer {
     width: 100%;
-    max-width: 240px;
+    min-width: 240px;
   }
 }
 
@@ -58,20 +58,20 @@
     margin-bottom: 32px;
   }
 
-  .footer {
+  /* .footer {
     gap: 16px;
-  }
+  } */
 
   .total {
     gap: 6px;
   }
 
-  :global(.text_type_digits-medium) {
-    font-size: calc(1rem * 0.85);
-  }
+  /* :global(.text_type_digits-medium) {
+    font-size: calc(1rem * 0.95);
+  } */
 
   :global(.text_type_main-default) {
-    font-size: calc(0.875rem * 0.85);
+    font-size: calc(1rem * 0.85);
   }
 }
 
@@ -79,5 +79,12 @@
   .burger_constructor {
     order: 2;
     width: 100%;
+  }
+
+  .footer {
+    gap: 16px;
+    width: 90%;
+    min-width: 240px;
+    margin: 0 auto;
   }
 }
