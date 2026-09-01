@@ -88,3 +88,16 @@
   margin: 0;
   line-height: 1.5;
 }
+
+@media (width <= 800px) {
+  .burger_ingredients {
+    order: 1;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .content {
+    height: auto;
+    padding-bottom: 40px;
+  }
+}

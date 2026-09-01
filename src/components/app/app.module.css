@@ -21,3 +21,22 @@
   margin: 0 auto;
   overflow: hidden;
 }
+
+@media (width <= 1259px) {
+  .main {
+    width: calc(100% - 40px);
+    max-width: 1240px;
+    padding: 0 20px;
+  }
+}
+
+@media (width <= 800px) {
+  .main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    overflow: auto;
+  }
+}
