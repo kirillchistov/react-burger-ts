@@ -94,6 +94,7 @@
     order: 1;
     max-width: 100%;
     height: auto;
+    margin-left: 1em;
   }
 
   .content {
