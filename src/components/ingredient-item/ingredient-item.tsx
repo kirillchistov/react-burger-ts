@@ -1,4 +1,5 @@
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
+import { useCallback } from 'react';
 
 import type { TIngredient } from '@utils/types';
 
@@ -15,21 +16,26 @@ export const IngredientItem = ({
   ingredient,
   onClick,
 }: TIngredientItemProps): React.JSX.Element => {
-  const handleClick = (): void => {
+  const handleClick = useCallback((): void => {
     onClick?.(ingredient);
-  };
+  }, [ingredient, onClick]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>): void => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick]
+  );
 
   return (
     <li className={styles.card}>
       <div
         className={styles.content}
         onClick={handleClick}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleClick();
-          }
-        }}
+        onKeyDown={handleKeyDown}
         role="button"
         tabIndex={0}
       >
