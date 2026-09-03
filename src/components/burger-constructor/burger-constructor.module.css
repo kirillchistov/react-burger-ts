@@ -1,7 +1,124 @@
-.burger_constructor {
+.burgerConstructor {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
-  width: 600px;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 600px;
+  height: 100%;
+  min-height: 0;
+  padding-top: 100px;
   padding-bottom: 20px;
   color: var(--text-primary-color);
+}
+
+.stack {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+
+.fillings {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.bun {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding-right: 8px;
+  padding-left: 32px;
+}
+
+.fillingItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fillingItem svg {
+  flex-shrink: 0;
+}
+
+.element {
+  min-width: 0;
+}
+
+.bun .element {
+  width: 100%;
+}
+
+.fillingItem > :global(.constructor-element) {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.bunBottom :global(img) {
+  transform: rotateY(180deg) rotateZ(180deg);
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 40px;
+}
+
+.total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (width <= 1100px) {
+  .burgerConstructor {
+    flex: 1 1 40%;
+    order: 2;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    padding-top: 24px;
+  }
+
+  .fillings {
+    min-height: 160px;
+  }
+
+  .footer {
+    gap: 16px;
+    width: 100%;
+  }
+}
+
+@media (width <= 800px) {
+  .burgerConstructor {
+    height: auto;
+  }
+
+  .stack,
+  .fillings {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .footer {
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    width: 90%;
+  }
 }
