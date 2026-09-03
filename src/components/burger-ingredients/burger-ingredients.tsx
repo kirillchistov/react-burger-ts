@@ -3,32 +3,33 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { IngredientItem } from '@components/ingredient-item/ingredient-item';
 
-import type { TIngredient } from '@utils/types';
+import type { TIngredient, TIngredientType } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
-
-type TIngredientGroupType = 'bun' | 'main' | 'sauce';
 
 type TBurgerIngredientsProps = {
   counts: Record<string, number>;
   ingredients: TIngredient[];
+  onIngredientClick: (ingredient: TIngredient) => void;
 };
 
-const ingredientGroups: readonly { label: string; type: TIngredientGroupType }[] = [
+const ingredientGroups: readonly { label: string; type: TIngredientType }[] = [
   { type: 'bun', label: 'Булки' },
   { type: 'sauce', label: 'Соусы' },
   { type: 'main', label: 'Начинки' },
 ];
 
+const isIngredientType = (value: string): value is TIngredientType =>
+  value === 'bun' || value === 'sauce' || value === 'main';
+
 export const BurgerIngredients = ({
   counts,
   ingredients,
+  onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
-  const [currentTab, setCurrentTab] = useState<TIngredientGroupType>('bun');
+  const [currentTab, setCurrentTab] = useState<TIngredientType>('bun');
   const contentRef = useRef<HTMLDivElement>(null);
-  const sectionRefs = useRef<Partial<Record<TIngredientGroupType, HTMLElement | null>>>(
-    {}
-  );
+  const sectionRefs = useRef<Partial<Record<TIngredientType, HTMLElement | null>>>({});
 
   const groupedIngredients = useMemo(
     () =>
@@ -40,11 +41,14 @@ export const BurgerIngredients = ({
   );
 
   const handleTabClick = useCallback((value: string): void => {
-    const nextTab = value as TIngredientGroupType;
-    const container = contentRef.current;
-    const section = sectionRefs.current[nextTab];
+    if (!isIngredientType(value)) {
+      return;
+    }
 
-    setCurrentTab(nextTab);
+    const container = contentRef.current;
+    const section = sectionRefs.current[value];
+
+    setCurrentTab(value);
 
     if (!container || !section) {
       return;
@@ -67,7 +71,7 @@ export const BurgerIngredients = ({
 
     const containerTop = container.getBoundingClientRect().top;
 
-    const nextTab = ingredientGroups.reduce<TIngredientGroupType>((closest, group) => {
+    const nextTab = ingredientGroups.reduce<TIngredientType>((closest, group) => {
       const section = sectionRefs.current[group.type];
 
       if (!section) {
@@ -123,6 +127,7 @@ export const BurgerIngredients = ({
                   key={ingredient._id}
                   count={counts[ingredient._id]}
                   ingredient={ingredient}
+                  onClick={onIngredientClick}
                 />
               ))}
             </ul>
