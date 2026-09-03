@@ -114,4 +114,11 @@
     min-height: 0;
     overflow: visible;
   }
+
+  .footer {
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    width: 90%;
+  }
 }
