@@ -1,9 +1,10 @@
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { AppHeader } from '@components/app-header/app-header';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
+import { getDemoBurger, getIngredientCounts } from '@utils/burger';
 import { getErrorMessage, getIngredientsApi } from '@utils/burger-api';
 
 import type { TIngredient } from '@utils/types';
@@ -41,12 +42,12 @@ export const App = (): React.JSX.Element => {
     };
   }, []);
 
+  const burger = useMemo(() => getDemoBurger(ingredients), [ingredients]);
+  const ingredientCounts = useMemo(() => getIngredientCounts(burger), [burger]);
+
   return (
     <div className={styles.app}>
       <AppHeader />
-      <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-        Соберите бургер
-      </h1>
       <main className={`${styles.main} pl-5 pr-5`}>
         {isLoading && (
           <div className={styles.status}>
@@ -57,10 +58,10 @@ export const App = (): React.JSX.Element => {
           <p className={`${styles.status} text text_type_main-medium`}>{error}</p>
         )}
         {!isLoading && !error && (
-          <>
-            <BurgerIngredients ingredients={ingredients} />
-            <BurgerConstructor ingredients={ingredients} />
-          </>
+          <div className={styles.columns}>
+            <BurgerIngredients counts={ingredientCounts} ingredients={ingredients} />
+            <BurgerConstructor bun={burger.bun} fillings={burger.fillings} />
+          </div>
         )}
       </main>
     </div>

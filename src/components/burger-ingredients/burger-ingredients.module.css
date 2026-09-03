@@ -1,26 +1,36 @@
-.burger_ingredients {
+.burgerIngredients {
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
   max-width: 600px;
   height: 100%;
+  min-height: 0;
   color: var(--text-primary-color);
 }
 
 .menu {
   display: flex;
+  flex-shrink: 0;
+  width: 100%;
   margin: 0;
   padding: 0;
   text-align: center;
-  list-style-type: none;
+}
+
+.menu :global(.tab) {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .content {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 40px;
-  height: 100%;
-  padding-top: 20px;
+  min-height: 0;
+  padding-top: 40px;
   overflow-y: auto;
 }
 
@@ -42,63 +52,26 @@
   list-style: none;
 }
 
-.card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-  min-height: 208px;
-  padding: 0 8px 16px;
-  text-align: center;
-}
-
-.imageWrap {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.image {
-  display: block;
-  width: 240px;
-  height: 120px;
-  object-fit: contain;
-}
-
-.counter {
-  position: absolute;
-  top: 0;
-  right: 10px;
-}
-
-.price {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.name {
-  max-width: 260px;
-  min-height: 48px;
-  margin: 0;
-  line-height: 1.5;
-}
-
-@media (width <= 800px) {
-  .burger_ingredients {
+@media (width <= 1100px) {
+  .burgerIngredients {
+    flex: 1 1 auto;
     order: 1;
+    width: 100%;
     max-width: 100%;
     height: auto;
-    margin-left: 1em;
+    min-height: 0;
   }
 
   .content {
+    min-height: 200px;
+  }
+}
+
+@media (width <= 800px) {
+  .content {
     height: auto;
+    min-height: 0;
     padding-bottom: 40px;
+    overflow: visible;
   }
 }
