@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist",
     "eslint": "eslint ./src/ --fix",
     "lint": "npm run stylelint && npm run eslint && npm run prettier",
+    "lint-commit": "commitlint --from HEAD~1 --to HEAD --verbose",
     "predeploy": "npm run build",
     "prepare": "husky",
     "prettier": "prettier \"./src/**/*.{js,jsx,ts,tsx,json,html,css,md}\" --write",
@@ -35,6 +36,7 @@
     "react-router-dom": "^7.9.3"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^9.36.0",
     "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.0",
@@ -46,6 +48,7 @@
     "@vitest/browser": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "commitizen": "^4.3.1",
+    "commitlint": "^21.2.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
