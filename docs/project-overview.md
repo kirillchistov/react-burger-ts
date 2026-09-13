@@ -18,9 +18,9 @@ https://pictures.s3.yandex.net/resources/image_1765450094.png
 
 Из библиотеки UI-компонентов возьмите следующие:
 -- [счётчики](https://react-burger-ui-components.education-services.ru/?path=/docs/components-counter--docs),
--- [иконки](https://react-burger-ui-components.education-services.ru/?path=/docs/components-icons--docs) ,
--- [типографику](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-typography--docs) ,
--- [систему отступов](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-box--docs) .
+-- [иконки](https://react-burger-ui-components.education-services.ru/?path=/docs/components-icons--docs),
+-- [типографику](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-typography--docs),
+-- [систему отступов](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-box--docs).
 
 У компонента свой кастомизированный скроллбар, используйте для него CSS-класс custom-scroll из библиотеки. Подумайте над реализацией и возможным ограничением высоты блока, в том числе и для разных разрешений экранов.
 
