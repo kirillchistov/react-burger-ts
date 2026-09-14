@@ -8,12 +8,14 @@ import {
 import styles from './app-header.module.css';
 
 export const AppHeader = (): React.JSX.Element => {
+  const homeHref = import.meta.env.BASE_URL;
+
   return (
     <header className={styles.header}>
       <nav className={`${styles.menu} p-4`}>
         <ul className={styles.menuPartLeft}>
           <li>
-            <a href="/" className={`${styles.link} ${styles.linkActive}`}>
+            <a href={homeHref} className={`${styles.link} ${styles.linkActive}`}>
               <BurgerIcon type="primary" />
               <span className={`${styles.linkText} text text_type_main-default`}>
                 Конструктор
@@ -21,7 +23,7 @@ export const AppHeader = (): React.JSX.Element => {
             </a>
           </li>
           <li>
-            <a href="/feed" className={styles.link}>
+            <a href={`${homeHref}feed`} className={styles.link}>
               <ListIcon type="secondary" />
               <span
                 className={`${styles.linkText} text text_type_main-default text_color_inactive`}
@@ -31,10 +33,13 @@ export const AppHeader = (): React.JSX.Element => {
             </a>
           </li>
         </ul>
-        <a href="/" className={styles.logo} aria-label="Stellar Burgers">
+        <a href={homeHref} className={styles.logo} aria-label="Stellar Burgers">
           <Logo />
         </a>
-        <a href="/profile" className={`${styles.link} ${styles.linkPositionLast}`}>
+        <a
+          href={`${homeHref}profile`}
+          className={`${styles.link} ${styles.linkPositionLast}`}
+        >
           <ProfileIcon type="secondary" />
           <span
             className={`${styles.linkText} text text_type_main-default text_color_inactive`}

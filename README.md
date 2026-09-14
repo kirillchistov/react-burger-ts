@@ -15,7 +15,17 @@ npm i
 npm run dev
 ```
 
-Сборка: `npm run build`. Превью продакшен-сборки: `npm run preview`.
+Сборка: `npm run build`. Превью продакшен-сборки: `npm run preview` (открыть путь `/react-burger-ts/`).
+
+## Деплой
+
+Сайт на GitHub Pages: https://kirillchistov.github.io/react-burger-ts/
+
+```bash
+npm run deploy
+```
+
+Скрипт собирает `dist` с `base: '/react-burger-ts/'`, копирует `index.html` в `404.html` для SPA-переходов и публикует ветку `gh-pages`.
 
 ## Спринт 1:
 [x] Список ингредиентов с сервера, прелоадер и обработка ошибок
