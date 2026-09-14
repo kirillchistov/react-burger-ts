@@ -1,15 +1,17 @@
+/* Ингредиенты и счётчики брать в Redux, а не из props. */
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { IngredientItem } from '@components/ingredient-item/ingredient-item';
+import { selectIngredientCounts } from '@services/burger-constructor/burger-constructor-slice';
+import { useAppSelector } from '@services/hooks';
+import { selectIngredients } from '@services/ingredients/ingredients-slice';
 
 import type { TIngredient, TIngredientType } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
 
 type TBurgerIngredientsProps = {
-  counts: Record<string, number>;
-  ingredients: TIngredient[];
   onIngredientClick: (ingredient: TIngredient) => void;
 };
 
@@ -23,10 +25,10 @@ const isIngredientType = (value: string): value is TIngredientType =>
   value === 'bun' || value === 'sauce' || value === 'main';
 
 export const BurgerIngredients = ({
-  counts,
-  ingredients,
   onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
+  const ingredients = useAppSelector(selectIngredients);
+  const counts = useAppSelector(selectIngredientCounts);
   const [currentTab, setCurrentTab] = useState<TIngredientType>('bun');
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRefs = useRef<Partial<Record<TIngredientType, HTMLHeadingElement | null>>>(

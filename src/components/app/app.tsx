@@ -1,3 +1,4 @@
+/* Очитить конструктор при закрытии попапа с номером заказа. */
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -8,9 +9,9 @@ import { IngredientDetails } from '@components/ingredient-details/ingredient-det
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
 import {
+  clearConstructor,
   selectConstructorBun,
   selectConstructorIngredients,
-  selectIngredientCounts,
 } from '@services/burger-constructor/burger-constructor-slice';
 import {
   clearCurrentIngredient,
@@ -20,7 +21,6 @@ import {
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { fetchIngredients } from '@services/ingredients/ingredients-actions';
 import {
-  selectIngredients,
   selectIngredientsError,
   selectIngredientsIsLoading,
 } from '@services/ingredients/ingredients-slice';
@@ -38,12 +38,10 @@ import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  const ingredients = useAppSelector(selectIngredients);
   const isLoading = useAppSelector(selectIngredientsIsLoading);
   const error = useAppSelector(selectIngredientsError);
   const bun = useAppSelector(selectConstructorBun);
   const fillings = useAppSelector(selectConstructorIngredients);
-  const ingredientCounts = useAppSelector(selectIngredientCounts);
   const selectedIngredient = useAppSelector(selectCurrentIngredient);
   const orderNumber = useAppSelector(selectOrderNumber);
   const orderIsLoading = useAppSelector(selectOrderIsLoading);
@@ -85,9 +83,13 @@ export const App = (): React.JSX.Element => {
   }, [bun, dispatch, fillings]);
 
   const handleCloseOrderModal = useCallback((): void => {
+    if (orderNumber !== null) {
+      dispatch(clearConstructor());
+    }
+
     setIsOrderModalOpen(false);
     dispatch(clearOrder());
-  }, [dispatch]);
+  }, [dispatch, orderNumber]);
 
   return (
     <div className={styles.app}>
@@ -103,11 +105,7 @@ export const App = (): React.JSX.Element => {
         )}
         {!isLoading && !error && (
           <div className={styles.columns}>
-            <BurgerIngredients
-              counts={ingredientCounts}
-              ingredients={ingredients}
-              onIngredientClick={handleIngredientClick}
-            />
+            <BurgerIngredients onIngredientClick={handleIngredientClick} />
             <BurgerConstructor onOrderClick={handleOpenOrderModal} />
           </div>
         )}

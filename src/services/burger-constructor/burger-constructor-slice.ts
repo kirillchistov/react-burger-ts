@@ -1,3 +1,5 @@
+/* clearConstructor: очистить булку и начинку после успешного заказа */
+/* Во время загрузки или если вернулась ошибка, не очищать ингридиенты */
 import { createSelector, createSlice, nanoid } from '@reduxjs/toolkit';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -44,6 +46,10 @@ export const burgerConstructorSlice = createSlice({
         state.ingredients.splice(toIndex, 0, movedIngredient);
       }
     },
+    clearConstructor: (state) => {
+      state.bun = null;
+      state.ingredients = [];
+    },
     removeIngredient: (state, action: PayloadAction<string>) => {
       state.ingredients = state.ingredients.filter(
         (ingredient) => ingredient.uuid !== action.payload
@@ -84,7 +90,7 @@ export const burgerConstructorSlice = createSlice({
   },
 });
 
-export const { addIngredient, moveIngredient, removeIngredient } =
+export const { addIngredient, clearConstructor, moveIngredient, removeIngredient } =
   burgerConstructorSlice.actions;
 
 export const {

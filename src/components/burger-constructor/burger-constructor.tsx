@@ -1,3 +1,4 @@
+/* Булка и начинки читаются из Redux, массив ингредиентов в props не передаётся. */
 import {
   Button,
   ConstructorElement,
