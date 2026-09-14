@@ -10,10 +10,15 @@ type TIngredientsResponse = TServerResponse<{
   data: TIngredient[];
 }>;
 
-const defaultErrorMessage =
+const defaultErrorMessage = 'Не удалось выполнить запрос. Попробуйте ещё раз.';
+const ingredientsErrorMessage =
   'Не удалось загрузить ингредиенты. Попробуйте обновить страницу.';
+const orderErrorMessage = 'Не удалось оформить заказ. Попробуйте ещё раз.';
 
-export const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (
+  error: unknown,
+  fallback = defaultErrorMessage
+): string => {
   if (
     typeof error === 'object' &&
     error !== null &&
@@ -25,7 +30,7 @@ export const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
 
-  return defaultErrorMessage;
+  return fallback;
 };
 
 export const checkResponse = <T>(res: Response): Promise<T> => {
@@ -48,5 +53,29 @@ export const getIngredientsApi = (signal?: AbortSignal): Promise<TIngredient[]> 
         return data.data;
       }
 
-      return Promise.reject(new Error(defaultErrorMessage));
+      return Promise.reject(new Error(ingredientsErrorMessage));
+    });
+
+type TOrderResponse = TServerResponse<{
+  name: string;
+  order: {
+    number: number;
+  };
+}>;
+
+export const createOrderApi = (ingredientIds: string[]): Promise<number> =>
+  fetch(`${BURGER_API_URL}/orders`, {
+    body: JSON.stringify({ ingredients: ingredientIds }),
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+    },
+    method: 'POST',
+  })
+    .then((res) => checkResponse<TOrderResponse>(res))
+    .then((data) => {
+      if (data.success) {
+        return data.order.number;
+      }
+
+      return Promise.reject(new Error(orderErrorMessage));
     });

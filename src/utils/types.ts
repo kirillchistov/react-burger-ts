@@ -14,3 +14,7 @@ export type TIngredient = {
   image_mobile: string;
   __v: number;
 };
+
+export type TConstructorIngredient = TIngredient & {
+  uuid: string;
+};

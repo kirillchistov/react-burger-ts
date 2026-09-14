@@ -1,5 +1,8 @@
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback } from 'react';
+import { useDrag } from 'react-dnd';
+
+import { DND_TYPES } from '@utils/dnd';
 
 import type { TIngredient } from '@utils/types';
 
@@ -16,6 +19,14 @@ export const IngredientItem = ({
   ingredient,
   onClick,
 }: TIngredientItemProps): React.JSX.Element => {
+  const [{ isDragging }, dragRef] = useDrag<TIngredient, void, { isDragging: boolean }>({
+    collect: (monitor): { isDragging: boolean } => ({
+      isDragging: monitor.isDragging(),
+    }),
+    item: ingredient,
+    type: ingredient.type === 'bun' ? DND_TYPES.BUN : DND_TYPES.FILLING,
+  });
+
   const handleClick = useCallback((): void => {
     onClick?.(ingredient);
   }, [ingredient, onClick]);
@@ -30,13 +41,19 @@ export const IngredientItem = ({
     [handleClick]
   );
 
+  const setDragRef = (node: HTMLDivElement | null): void => {
+    dragRef(node);
+  };
+
   return (
     <li className={styles.card}>
       <div
         className={styles.content}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        ref={setDragRef}
         role="button"
+        style={{ opacity: isDragging ? 0.4 : 1 }}
         tabIndex={0}
       >
         <div className={styles.imageWrap}>
