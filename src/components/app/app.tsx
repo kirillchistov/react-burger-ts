@@ -1,133 +1,105 @@
-/* Очитить конструктор при закрытии попапа с номером заказа. */
-import { Preloader } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 
 import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { Modal } from '@components/modal/modal';
-import { OrderDetails } from '@components/order-details/order-details';
-import {
-  clearConstructor,
-  selectConstructorBun,
-  selectConstructorIngredients,
-} from '@services/burger-constructor/burger-constructor-slice';
-import {
-  clearCurrentIngredient,
-  selectCurrentIngredient,
-  setCurrentIngredient,
-} from '@services/current-ingredient/current-ingredient-slice';
-import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { ProtectedRoute } from '@components/protected-route/protected-route';
+import { FeedPage } from '@pages/feed/feed-page';
+import { ForgotPasswordPage } from '@pages/forgot-password/forgot-password-page';
+import { Home } from '@pages/home/home';
+import { IngredientModal, IngredientPage } from '@pages/ingredient/ingredient-page';
+import { LoginPage } from '@pages/login/login-page';
+import { NotFoundPage } from '@pages/not-found/not-found-page';
+import { ProfileLayout } from '@pages/profile/profile-layout';
+import { ProfileOrdersPage } from '@pages/profile/profile-orders-page';
+import { ProfilePage } from '@pages/profile/profile-page';
+import { RegisterPage } from '@pages/register/register-page';
+import { ResetPasswordPage } from '@pages/reset-password/reset-password-page';
+import { getUser } from '@services/auth/auth-actions';
+import { useAppDispatch } from '@services/hooks';
 import { fetchIngredients } from '@services/ingredients/ingredients-actions';
-import {
-  selectIngredientsError,
-  selectIngredientsIsLoading,
-} from '@services/ingredients/ingredients-slice';
-import { createOrder } from '@services/order/order-actions';
-import {
-  clearOrder,
-  selectOrderError,
-  selectOrderIsLoading,
-  selectOrderNumber,
-} from '@services/order/order-slice';
+import { ROUTES } from '@utils/constants';
 
-import type { TIngredient } from '@utils/types';
+import type { Location } from 'react-router-dom';
 
 import styles from './app.module.css';
 
+type TLocationState = {
+  background?: Location;
+};
+
 export const App = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(selectIngredientsIsLoading);
-  const error = useAppSelector(selectIngredientsError);
-  const bun = useAppSelector(selectConstructorBun);
-  const fillings = useAppSelector(selectConstructorIngredients);
-  const selectedIngredient = useAppSelector(selectCurrentIngredient);
-  const orderNumber = useAppSelector(selectOrderNumber);
-  const orderIsLoading = useAppSelector(selectOrderIsLoading);
-  const orderError = useAppSelector(selectOrderError);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const location = useLocation();
+  const background = (location.state as TLocationState | null)?.background;
 
   useEffect(() => {
     const request = dispatch(fetchIngredients());
+    void dispatch(getUser());
 
     return (): void => {
       request.abort();
     };
   }, [dispatch]);
 
-  const handleIngredientClick = useCallback(
-    (ingredient: TIngredient): void => {
-      dispatch(setCurrentIngredient(ingredient));
-    },
-    [dispatch]
-  );
-
-  const handleCloseIngredientModal = useCallback((): void => {
-    dispatch(clearCurrentIngredient());
-  }, [dispatch]);
-
-  const handleOpenOrderModal = useCallback((): void => {
-    if (!bun) {
-      return;
-    }
-
-    const ingredientIds = [
-      bun._id,
-      ...fillings.map((ingredient) => ingredient._id),
-      bun._id,
-    ];
-
-    setIsOrderModalOpen(true);
-    void dispatch(createOrder(ingredientIds));
-  }, [bun, dispatch, fillings]);
-
-  const handleCloseOrderModal = useCallback((): void => {
-    if (orderNumber !== null) {
-      dispatch(clearConstructor());
-    }
-
-    setIsOrderModalOpen(false);
-    dispatch(clearOrder());
-  }, [dispatch, orderNumber]);
-
   return (
     <div className={styles.app}>
       <AppHeader />
       <main className={`${styles.main} pl-5 pr-5`}>
-        {isLoading && (
-          <div className={styles.status}>
-            <Preloader />
-          </div>
-        )}
-        {error && (
-          <p className={`${styles.status} text text_type_main-medium`}>{error}</p>
-        )}
-        {!isLoading && !error && (
-          <div className={styles.columns}>
-            <BurgerIngredients onIngredientClick={handleIngredientClick} />
-            <BurgerConstructor onOrderClick={handleOpenOrderModal} />
-          </div>
+        <Routes location={background ?? location}>
+          <Route element={<Home />} path={ROUTES.HOME} />
+          <Route element={<IngredientPage />} path={ROUTES.INGREDIENT} />
+          <Route
+            element={
+              <ProtectedRoute onlyUnAuth>
+                <LoginPage />
+              </ProtectedRoute>
+            }
+            path={ROUTES.LOGIN}
+          />
+          <Route
+            element={
+              <ProtectedRoute onlyUnAuth>
+                <RegisterPage />
+              </ProtectedRoute>
+            }
+            path={ROUTES.REGISTER}
+          />
+          <Route
+            element={
+              <ProtectedRoute onlyUnAuth>
+                <ForgotPasswordPage />
+              </ProtectedRoute>
+            }
+            path={ROUTES.FORGOT_PASSWORD}
+          />
+          <Route
+            element={
+              <ProtectedRoute onlyUnAuth>
+                <ResetPasswordPage />
+              </ProtectedRoute>
+            }
+            path={ROUTES.RESET_PASSWORD}
+          />
+          <Route
+            element={
+              <ProtectedRoute>
+                <ProfileLayout />
+              </ProtectedRoute>
+            }
+            path={ROUTES.PROFILE}
+          >
+            <Route element={<ProfilePage />} index />
+            <Route element={<ProfileOrdersPage />} path="orders" />
+          </Route>
+          <Route element={<FeedPage />} path={ROUTES.FEED} />
+          <Route element={<NotFoundPage />} path="*" />
+        </Routes>
+        {background && (
+          <Routes>
+            <Route element={<IngredientModal />} path={ROUTES.INGREDIENT} />
+          </Routes>
         )}
       </main>
-      {selectedIngredient && (
-        <Modal onClose={handleCloseIngredientModal} title="Детали ингредиента">
-          <IngredientDetails ingredient={selectedIngredient} />
-        </Modal>
-      )}
-      {isOrderModalOpen && (
-        <Modal onClose={handleCloseOrderModal}>
-          {orderIsLoading && (
-            <div className={styles.status}>
-              <Preloader />
-            </div>
-          )}
-          {orderError && (
-            <p className="text text_type_main-medium mb-15">{orderError}</p>
-          )}
-          {orderNumber !== null && <OrderDetails />}
-        </Modal>
-      )}
     </div>
   );
 };
