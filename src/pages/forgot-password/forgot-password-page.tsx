@@ -1,0 +1,76 @@
+import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
+import { useCallback, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { forgotPassword } from '@services/auth/auth-actions';
+import { useAppDispatch } from '@services/hooks';
+import { setResetPasswordAllowed } from '@utils/auth';
+import { ROUTES } from '@utils/constants';
+
+import styles from '../auth/auth-form.module.css';
+
+export const ForgotPasswordPage = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEmailChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setEmail(event.target.value);
+    },
+    []
+  );
+
+  const handleSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>): void => {
+      event.preventDefault();
+      setError(null);
+      setIsLoading(true);
+
+      void dispatch(forgotPassword(email))
+        .unwrap()
+        .then((): void => {
+          setResetPasswordAllowed(true);
+          void navigate(ROUTES.RESET_PASSWORD);
+        })
+        .catch((message: string): void => {
+          setError(message);
+        })
+        .finally((): void => {
+          setIsLoading(false);
+        });
+    },
+    [dispatch, email, navigate]
+  );
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <h1 className={`${styles.title} text text_type_main-medium`}>
+        Восстановление пароля
+      </h1>
+      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      <EmailInput
+        extraClass="mb-6"
+        name="email"
+        onChange={handleEmailChange}
+        placeholder="Укажите e-mail"
+        value={email}
+      />
+      <Button disabled={isLoading} htmlType="submit" size="medium" type="primary">
+        Восстановить
+      </Button>
+      <div className={styles.links}>
+        <p
+          className={`${styles.linkLine} text text_type_main-default text_color_inactive`}
+        >
+          Вспомнили пароль?
+          <Link className={styles.link} to={ROUTES.LOGIN}>
+            Войти
+          </Link>
+        </p>
+      </div>
+    </form>
+  );
+};
