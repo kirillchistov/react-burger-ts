@@ -1,7 +1,9 @@
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback } from 'react';
 import { useDrag } from 'react-dnd';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import { getIngredientPath } from '@utils/constants';
 import { DND_TYPES } from '@utils/dnd';
 
 import type { TIngredient } from '@utils/types';
@@ -11,14 +13,14 @@ import styles from './ingredient-item.module.css';
 type TIngredientItemProps = {
   count?: number;
   ingredient: TIngredient;
-  onClick?: (ingredient: TIngredient) => void;
 };
 
 export const IngredientItem = ({
   count = 0,
   ingredient,
-  onClick,
 }: TIngredientItemProps): React.JSX.Element => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [{ isDragging }, dragRef] = useDrag<TIngredient, void, { isDragging: boolean }>({
     collect: (monitor): { isDragging: boolean } => ({
       isDragging: monitor.isDragging(),
@@ -28,8 +30,10 @@ export const IngredientItem = ({
   });
 
   const handleClick = useCallback((): void => {
-    onClick?.(ingredient);
-  }, [ingredient, onClick]);
+    void navigate(getIngredientPath(ingredient._id), {
+      state: { background: location },
+    });
+  }, [ingredient._id, location, navigate]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>): void => {
