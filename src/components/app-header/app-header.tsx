@@ -4,49 +4,64 @@ import {
   Logo,
   ProfileIcon,
 } from '@krgaa/react-developer-burger-ui-components';
+import { NavLink } from 'react-router-dom';
+
+import { ROUTES } from '@utils/constants';
 
 import styles from './app-header.module.css';
 
 export const AppHeader = (): React.JSX.Element => {
-  const homeHref = import.meta.env.BASE_URL;
-
   return (
     <header className={styles.header}>
       <nav className={`${styles.menu} p-4`}>
         <ul className={styles.menuPartLeft}>
           <li>
-            <a href={homeHref} className={`${styles.link} ${styles.linkActive}`}>
-              <BurgerIcon type="primary" />
-              <span className={`${styles.linkText} text text_type_main-default`}>
-                Конструктор
-              </span>
-            </a>
+            <NavLink className={styles.link} end to={ROUTES.HOME}>
+              {({ isActive }): React.JSX.Element => (
+                <>
+                  <BurgerIcon type={isActive ? 'primary' : 'secondary'} />
+                  <span
+                    className={`${styles.linkText} text text_type_main-default ${isActive ? styles.linkActive : 'text_color_inactive'}`}
+                  >
+                    Конструктор
+                  </span>
+                </>
+              )}
+            </NavLink>
           </li>
           <li>
-            <a href={`${homeHref}feed`} className={styles.link}>
-              <ListIcon type="secondary" />
-              <span
-                className={`${styles.linkText} text text_type_main-default text_color_inactive`}
-              >
-                Лента заказов
-              </span>
-            </a>
+            <NavLink className={styles.link} to={ROUTES.FEED}>
+              {({ isActive }): React.JSX.Element => (
+                <>
+                  <ListIcon type={isActive ? 'primary' : 'secondary'} />
+                  <span
+                    className={`${styles.linkText} text text_type_main-default ${isActive ? styles.linkActive : 'text_color_inactive'}`}
+                  >
+                    Лента заказов
+                  </span>
+                </>
+              )}
+            </NavLink>
           </li>
         </ul>
-        <a href={homeHref} className={styles.logo} aria-label="Stellar Burgers">
+        <NavLink aria-label="Stellar Burgers" className={styles.logo} to={ROUTES.HOME}>
           <Logo />
-        </a>
-        <a
-          href={`${homeHref}profile`}
+        </NavLink>
+        <NavLink
           className={`${styles.link} ${styles.linkPositionLast}`}
+          to={ROUTES.PROFILE}
         >
-          <ProfileIcon type="secondary" />
-          <span
-            className={`${styles.linkText} text text_type_main-default text_color_inactive`}
-          >
-            Личный кабинет
-          </span>
-        </a>
+          {({ isActive }): React.JSX.Element => (
+            <>
+              <ProfileIcon type={isActive ? 'primary' : 'secondary'} />
+              <span
+                className={`${styles.linkText} text text_type_main-default ${isActive ? styles.linkActive : 'text_color_inactive'}`}
+              >
+                Личный кабинет
+              </span>
+            </>
+          )}
+        </NavLink>
       </nav>
     </header>
   );
