@@ -18,3 +18,13 @@ export type TIngredient = {
 export type TConstructorIngredient = TIngredient & {
   uuid: string;
 };
+
+export type TUser = {
+  email: string;
+  name: string;
+};
+
+export type TAuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
