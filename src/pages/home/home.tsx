@@ -1,3 +1,4 @@
+// S3.1 Вынести в Home меню ингредиентов, конструктор заказа, DndProvider
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';
