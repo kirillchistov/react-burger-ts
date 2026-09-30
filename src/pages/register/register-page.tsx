@@ -1,3 +1,4 @@
+// S3.3.1: Вынести RegisterPage в отдельный компонент с формой регистрации
 import {
   Button,
   EmailInput,

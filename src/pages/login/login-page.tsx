@@ -1,3 +1,4 @@
+// S3.3.1: Вынести LoginPage в отдельный компонент с формой авторизации
 import {
   Button,
   EmailInput,
