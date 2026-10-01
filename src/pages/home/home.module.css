@@ -1,0 +1,48 @@
+.columns {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.status {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.home {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (width <= 1100px) {
+  .home {
+    overflow: visible;
+  }
+
+  .columns {
+    flex-direction: column;
+    gap: 24px;
+    overflow: visible;
+  }
+}
+
+@media (width <= 800px) {
+  .home {
+    overflow: visible;
+  }
+
+  .columns {
+    height: auto;
+    overflow: visible;
+  }
+}

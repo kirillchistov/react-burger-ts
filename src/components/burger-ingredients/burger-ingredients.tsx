@@ -1,17 +1,15 @@
+/* Ингредиенты и счётчики брать в Redux, а не из props. */
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { IngredientItem } from '@components/ingredient-item/ingredient-item';
+import { selectIngredientCounts } from '@services/burger-constructor/burger-constructor-slice';
+import { useAppSelector } from '@services/hooks';
+import { selectIngredients } from '@services/ingredients/ingredients-slice';
 
-import type { TIngredient, TIngredientType } from '@utils/types';
+import type { TIngredientType } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
-
-type TBurgerIngredientsProps = {
-  counts: Record<string, number>;
-  ingredients: TIngredient[];
-  onIngredientClick: (ingredient: TIngredient) => void;
-};
 
 const ingredientGroups: readonly { label: string; type: TIngredientType }[] = [
   { type: 'bun', label: 'Булки' },
@@ -22,14 +20,14 @@ const ingredientGroups: readonly { label: string; type: TIngredientType }[] = [
 const isIngredientType = (value: string): value is TIngredientType =>
   value === 'bun' || value === 'sauce' || value === 'main';
 
-export const BurgerIngredients = ({
-  counts,
-  ingredients,
-  onIngredientClick,
-}: TBurgerIngredientsProps): React.JSX.Element => {
+export const BurgerIngredients = (): React.JSX.Element => {
+  const ingredients = useAppSelector(selectIngredients);
+  const counts = useAppSelector(selectIngredientCounts);
   const [currentTab, setCurrentTab] = useState<TIngredientType>('bun');
   const contentRef = useRef<HTMLDivElement>(null);
-  const sectionRefs = useRef<Partial<Record<TIngredientType, HTMLElement | null>>>({});
+  const titleRefs = useRef<Partial<Record<TIngredientType, HTMLHeadingElement | null>>>(
+    {}
+  );
 
   const groupedIngredients = useMemo(
     () =>
@@ -46,16 +44,16 @@ export const BurgerIngredients = ({
     }
 
     const container = contentRef.current;
-    const section = sectionRefs.current[value];
+    const title = titleRefs.current[value];
 
     setCurrentTab(value);
 
-    if (!container || !section) {
+    if (!container || !title) {
       return;
     }
 
     const top =
-      section.getBoundingClientRect().top -
+      title.getBoundingClientRect().top -
       container.getBoundingClientRect().top +
       container.scrollTop;
 
@@ -69,19 +67,19 @@ export const BurgerIngredients = ({
       return;
     }
 
-    const containerTop = container.getBoundingClientRect().top;
+    const containerRect = container.getBoundingClientRect();
 
     const nextTab = ingredientGroups.reduce<TIngredientType>((closest, group) => {
-      const section = sectionRefs.current[group.type];
+      const title = titleRefs.current[group.type];
 
-      if (!section) {
+      if (!title) {
         return closest;
       }
 
-      const closestSection = sectionRefs.current[closest];
-      const distance = Math.abs(section.getBoundingClientRect().top - containerTop);
-      const closestDistance = closestSection
-        ? Math.abs(closestSection.getBoundingClientRect().top - containerTop)
+      const closestTitle = titleRefs.current[closest];
+      const distance = Math.abs(title.getBoundingClientRect().top - containerRect.top);
+      const closestDistance = closestTitle
+        ? Math.abs(closestTitle.getBoundingClientRect().top - containerRect.top)
         : Number.POSITIVE_INFINITY;
 
       return distance < closestDistance ? group.type : closest;
@@ -113,21 +111,21 @@ export const BurgerIngredients = ({
         ref={contentRef}
       >
         {groupedIngredients.map(({ type, label, items }) => (
-          <section
-            key={type}
-            className={styles.group}
-            ref={(element) => {
-              sectionRefs.current[type] = element;
-            }}
-          >
-            <h2 className={`${styles.title} text text_type_main-medium`}>{label}</h2>
+          <section key={type} className={styles.group}>
+            <h2
+              className={`${styles.title} text text_type_main-medium`}
+              ref={(element) => {
+                titleRefs.current[type] = element;
+              }}
+            >
+              {label}
+            </h2>
             <ul className={styles.items}>
               {items.map((ingredient) => (
                 <IngredientItem
                   key={ingredient._id}
                   count={counts[ingredient._id]}
                   ingredient={ingredient}
-                  onClick={onIngredientClick}
                 />
               ))}
             </ul>

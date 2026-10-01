@@ -41,10 +41,15 @@
   padding-left: 32px;
 }
 
+.fillingsEmpty {
+  overflow: hidden;
+}
+
 .fillingItem {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: grab;
 }
 
 .fillingItem svg {
