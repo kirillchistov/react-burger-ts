@@ -1,3 +1,4 @@
+// S3.3.4: Создать заглушку FeedPage для будущей ленты заказов
 import { Link } from 'react-router-dom';
 
 import { ROUTES } from '@utils/constants';

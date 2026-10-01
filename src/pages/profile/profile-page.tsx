@@ -1,3 +1,5 @@
+// S3.3.3: Вынести ProfilePage в отдельный компонент с формой профиля
+// S3.8: Доработка профиля: изменение, отмена, сохранение, очистка формы
 import { Button, Input } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 

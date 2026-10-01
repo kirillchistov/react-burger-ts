@@ -1,3 +1,5 @@
+// S3.3 Типы для Burger API
+// S3.5 Типы для токенов Авторизации
 export type TIngredientType = 'bun' | 'main' | 'sauce';
 
 export type TIngredient = {

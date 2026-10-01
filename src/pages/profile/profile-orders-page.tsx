@@ -1,4 +1,6 @@
-/* eslint-disable css-modules/no-unused-class -- общие стили заглушки включают ссылку */
+// S3.3.4: Создать заглушку ProfileOrderPage для будущей истории заказов пользователя
+/* eslint-disable css-modules/no-unused-class -- общие стили заглушки */
+
 import styles from '../stub/stub-page.module.css';
 
 export const ProfileOrdersPage = (): React.JSX.Element => (

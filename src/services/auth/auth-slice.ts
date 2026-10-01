@@ -1,3 +1,4 @@
+// S3.5 Слайс для регистрации и управления состоянием авторизации
 import { createSlice } from '@reduxjs/toolkit';
 
 import {

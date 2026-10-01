@@ -1,3 +1,4 @@
+// S3.2: Вынести IngredientPage в отдельный компонент с модальным окном
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useNavigate, useParams } from 'react-router-dom';
 

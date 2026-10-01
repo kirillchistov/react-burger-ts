@@ -1,3 +1,5 @@
+// S3.3.3: Вынести ProfileLayout в отдельный компонент с меню и контентом
+// S3.8: Доработка профиля: после logout переход на /login + from
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import { logoutUser } from '@services/auth/auth-actions';

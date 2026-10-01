@@ -1,3 +1,4 @@
+// S3.5 Экшены для регистрации, входа, выхода, получения и обновления пользователя
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { clearTokens, getRefreshToken } from '@utils/auth';

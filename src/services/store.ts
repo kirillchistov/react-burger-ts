@@ -1,3 +1,4 @@
+// S3.5 Конфигурация Redux-store для авторизации
 import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
 import { authSlice } from './auth/auth-slice';

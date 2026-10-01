@@ -1,3 +1,4 @@
+// S3.2: Вынести IngredientItem в отдельный компонент с DnD и модальным окном
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback } from 'react';
 import { useDrag } from 'react-dnd';

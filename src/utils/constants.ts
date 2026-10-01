@@ -1,3 +1,5 @@
+// S3.3 Константы для Burger API, модальных окон, маршрутов
+// S3.5 Константы для токенов Авторизации
 export const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
 
 export const MODALS_ROOT_ID = 'modals';
