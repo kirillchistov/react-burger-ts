@@ -1,4 +1,5 @@
 // S3.3.2: Страница reset-password с формой сброса пароля
+// S3.6.2: Сброс: запрос -> флаг, успех -> переход на /login, нет -> на /forgot-password
 import {
   Button,
   Input,

@@ -1,5 +1,6 @@
 // S3.3 Burger API - Основные функции
 // S3.5 Burger API - Обновление токенов Авторизации, Обработка ошибок
+// S3.6 Burger API - Запрос на восстановление пароля, Сброс пароля
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@utils/auth';
 import { BURGER_API_URL } from '@utils/constants';
 

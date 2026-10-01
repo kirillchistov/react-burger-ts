@@ -1,4 +1,5 @@
 // S3.3.2: Страница forgot-password с формой восстановления пароля
+// S3.6.1: Восстановление пароля: запрос, флаг в localStorage, переход на /reset-password
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
