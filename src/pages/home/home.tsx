@@ -1,4 +1,5 @@
 // S3.1 Вынести в Home меню ингредиентов, конструктор заказа, DndProvider
+// S3.7 Защищенный маршрут для Home (гость с заказом → /login + from)
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';

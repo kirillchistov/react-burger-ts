@@ -5,6 +5,7 @@
 // S3.3.3: Маршруты для ProfileLayout, ProfilePage
 // S3.3.4: Маршруты для ProfileOrdersPage, FeedPage
 // S3.3.5: Маршруты для NotFoundPage
+// S3.7 Маршруты для ProtectedRoute (getUser при старте)
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
