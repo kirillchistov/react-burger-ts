@@ -1,3 +1,4 @@
+// S3.3.2: Страница reset-password с формой сброса пароля
 import {
   Button,
   Input,

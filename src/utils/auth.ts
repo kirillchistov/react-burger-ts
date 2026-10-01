@@ -1,3 +1,4 @@
+// S3.5 Авторизация и регистрация - Локальное хранилище токенов
 import {
   ACCESS_TOKEN_KEY,
   REFRESH_TOKEN_KEY,

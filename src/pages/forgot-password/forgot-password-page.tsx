@@ -1,3 +1,4 @@
+// S3.3.2: Страница forgot-password с формой восстановления пароля
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
