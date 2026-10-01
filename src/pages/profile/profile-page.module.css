@@ -6,12 +6,30 @@
   max-width: 480px;
 }
 
+.form :global(.input) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
 .error {
   margin: 0 0 24px;
 }
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-self: flex-end;
   gap: 8px;
+}
+
+@media (width <= 560px) {
+  .form {
+    max-width: none;
+  }
+
+  .actions {
+    justify-content: flex-end;
+    align-self: stretch;
+  }
 }

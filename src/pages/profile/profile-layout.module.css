@@ -19,21 +19,21 @@
 
 .link {
   display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
   padding: 17px 0;
-  color: inherit;
+  color: #8585ad;
   text-align: left;
   text-decoration: none;
   background: none;
   border: none;
   cursor: pointer;
+  appearance: none;
 }
 
 .linkActive {
   color: var(--text-primary-color);
-}
-
-.logout {
-  font: inherit;
 }
 
 .hint {
@@ -49,11 +49,36 @@
 @media (width <= 900px) {
   .layout {
     flex-direction: column;
-    gap: 32px;
-    padding-top: 40px;
+    gap: 24px;
+    padding: 32px 0 40px;
   }
 
   .menu {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px 24px;
     width: 100%;
+  }
+
+  .link {
+    width: auto;
+    padding: 8px 0;
+  }
+
+  .hint {
+    flex-basis: 100%;
+    max-width: none;
+    margin: 8px 0 0;
+  }
+}
+
+@media (width <= 560px) {
+  .layout {
+    gap: 20px;
+    padding: 16px 0 24px;
+  }
+
+  .menu {
+    gap: 4px 16px;
   }
 }

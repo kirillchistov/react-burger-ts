@@ -26,7 +26,7 @@ export const ProfileLayout = (): React.JSX.Element => {
       <nav className={styles.menu}>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : 'text_color_inactive'}`
+            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
           }
           end
           to={ROUTES.PROFILE}
@@ -35,14 +35,14 @@ export const ProfileLayout = (): React.JSX.Element => {
         </NavLink>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : 'text_color_inactive'}`
+            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
           }
           to={ROUTES.PROFILE_ORDERS}
         >
           История заказов
         </NavLink>
         <button
-          className={`${styles.link} ${styles.logout} text text_type_main-medium text_color_inactive`}
+          className={`${styles.link} text text_type_main-medium`}
           onClick={handleLogout}
           type="button"
         >

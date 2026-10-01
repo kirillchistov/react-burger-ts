@@ -1,15 +1,35 @@
 .page {
   display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
   width: 100%;
   min-height: 0;
-  padding: 80px 16px;
+  padding: 40px 16px;
   text-align: center;
+}
+
+.pageCompact {
+  justify-content: flex-start;
+  align-items: flex-start;
+  max-width: 480px;
+  padding: 0;
+  text-align: left;
 }
 
 .link {
   color: #4c4cff;
   text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (width <= 560px) {
+  .page {
+    padding: 24px 8px;
+  }
 }
