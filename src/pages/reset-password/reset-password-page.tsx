@@ -55,10 +55,12 @@ export const ResetPasswordPage = (): React.JSX.Element => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={`${styles.title} text text_type_main-medium`}>
+      <h1 className={`${styles.title} text text_type_main-medium mb-6`}>
         Восстановление пароля
       </h1>
-      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      {error && (
+        <p className={`${styles.error} text text_type_main-default mb-6`}>{error}</p>
+      )}
       <PasswordInput
         extraClass="mb-6"
         name="password"

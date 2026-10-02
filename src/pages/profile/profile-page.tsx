@@ -79,7 +79,9 @@ export const ProfilePage = (): React.JSX.Element | null => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      {error && (
+        <p className={`${styles.error} text text_type_main-default mb-6`}>{error}</p>
+      )}
       <Input
         extraClass="mb-6"
         icon="EditIcon"

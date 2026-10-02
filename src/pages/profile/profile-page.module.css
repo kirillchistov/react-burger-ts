@@ -12,8 +12,8 @@
   max-width: 100%;
 }
 
-.error:global(.text) {
-  margin: 0 0 24px;
+.error {
+  margin: 0;
 }
 
 .actions {

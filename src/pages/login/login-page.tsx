@@ -36,8 +36,10 @@ export const LoginPage = (): React.JSX.Element => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={`${styles.title} text text_type_main-medium`}>Вход</h1>
-      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      <h1 className={`${styles.title} text text_type_main-medium mb-6`}>Вход</h1>
+      {error && (
+        <p className={`${styles.error} text text_type_main-default mb-6`}>{error}</p>
+      )}
       <EmailInput
         extraClass="mb-6"
         name="email"

@@ -39,8 +39,8 @@
   flex-direction: column;
 }
 
-.title:global(.text) {
-  margin: 0 0 24px;
+.title {
+  margin: 0;
 }
 
 .items {

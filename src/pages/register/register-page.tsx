@@ -38,8 +38,10 @@ export const RegisterPage = (): React.JSX.Element => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={`${styles.title} text text_type_main-medium`}>Регистрация</h1>
-      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      <h1 className={`${styles.title} text text_type_main-medium mb-6`}>Регистрация</h1>
+      {error && (
+        <p className={`${styles.error} text text_type_main-default mb-6`}>{error}</p>
+      )}
       <Input
         extraClass="mb-6"
         name="name"

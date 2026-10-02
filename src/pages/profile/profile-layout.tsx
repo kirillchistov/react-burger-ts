@@ -26,7 +26,7 @@ export const ProfileLayout = (): React.JSX.Element => {
       <nav className={styles.menu}>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
+            `${styles.link} text text_type_main-medium pt-4 pb-4 ${isActive ? styles.linkActive : ''}`
           }
           end
           to={ROUTES.PROFILE}
@@ -35,20 +35,22 @@ export const ProfileLayout = (): React.JSX.Element => {
         </NavLink>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
+            `${styles.link} text text_type_main-medium pt-4 pb-4 ${isActive ? styles.linkActive : ''}`
           }
           to={ROUTES.PROFILE_ORDERS}
         >
           История заказов
         </NavLink>
         <button
-          className={`${styles.link} text text_type_main-medium`}
+          className={`${styles.link} text text_type_main-medium pt-4 pb-4`}
           onClick={handleLogout}
           type="button"
         >
           Выход
         </button>
-        <p className={`${styles.hint} text text_type_main-default text_color_inactive`}>
+        <p
+          className={`${styles.hint} text text_type_main-default text_color_inactive mt-20`}
+        >
           В этом разделе вы можете изменить свои персональные данные
         </p>
       </nav>
