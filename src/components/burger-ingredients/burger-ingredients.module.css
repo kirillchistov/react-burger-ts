@@ -39,7 +39,7 @@
   flex-direction: column;
 }
 
-.title {
+.title:global(.text) {
   margin: 0 0 24px;
 }
 

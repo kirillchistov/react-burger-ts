@@ -17,8 +17,9 @@
   width: 320px;
 }
 
-.menu a.link,
-.menu button.link {
+/* :global(.text) — UI-kit инжектит `.text { padding/margin: 0 }` после бандла */
+
+.link:global(.text) {
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -37,7 +38,7 @@
   color: var(--text-primary-color);
 }
 
-.menu .hint {
+.hint:global(.text) {
   max-width: 320px;
   margin: 80px 0 0;
 }
@@ -61,13 +62,12 @@
     width: 100%;
   }
 
-  .menu a.link,
-  .menu button.link {
+  .link:global(.text) {
     width: auto;
     padding: 8px 0;
   }
 
-  .menu .hint {
+  .hint:global(.text) {
     flex-basis: 100%;
     max-width: none;
     margin: 8px 0 0;

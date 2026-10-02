@@ -12,7 +12,7 @@
   max-width: 100%;
 }
 
-.error {
+.error:global(.text) {
   margin: 0 0 24px;
 }
 

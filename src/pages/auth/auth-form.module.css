@@ -17,12 +17,12 @@
   max-width: 100%;
 }
 
-.title {
+.title:global(.text) {
   margin: 0 0 24px;
   text-align: center;
 }
 
-.error {
+.error:global(.text) {
   max-width: 480px;
   margin: 0 0 24px;
   text-align: center;
