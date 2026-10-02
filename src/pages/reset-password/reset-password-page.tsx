@@ -1,5 +1,6 @@
 // S3.3.2: Страница reset-password с формой сброса пароля
 // S3.6.2: Сброс: запрос -> флаг, успех -> переход на /login, нет -> на /forgot-password
+// S3.9 По мотивам ревью, переделал на useForm
 import {
   Button,
   Input,
@@ -8,6 +9,7 @@ import {
 import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { resetPassword } from '@services/auth/auth-actions';
 import { useAppDispatch } from '@services/hooks';
 import { isResetPasswordAllowed, setResetPasswordAllowed } from '@utils/auth';
@@ -18,24 +20,12 @@ import styles from '../auth/auth-form.module.css';
 export const ResetPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
+  const { values, handleChange } = useForm({
+    password: '',
+    token: '',
+  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handlePasswordChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setPassword(event.target.value);
-    },
-    []
-  );
-
-  const handleTokenChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setToken(event.target.value);
-    },
-    []
-  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
@@ -43,7 +33,7 @@ export const ResetPasswordPage = (): React.JSX.Element => {
       setError(null);
       setIsLoading(true);
 
-      void dispatch(resetPassword({ password, token }))
+      void dispatch(resetPassword(values))
         .unwrap()
         .then((): void => {
           setResetPasswordAllowed(false);
@@ -56,7 +46,7 @@ export const ResetPasswordPage = (): React.JSX.Element => {
           setIsLoading(false);
         });
     },
-    [dispatch, navigate, password, token]
+    [dispatch, navigate, values]
   );
 
   if (!isResetPasswordAllowed()) {
@@ -72,17 +62,17 @@ export const ResetPasswordPage = (): React.JSX.Element => {
       <PasswordInput
         extraClass="mb-6"
         name="password"
-        onChange={handlePasswordChange}
+        onChange={handleChange}
         placeholder="Введите новый пароль"
-        value={password}
+        value={values.password}
       />
       <Input
         extraClass="mb-6"
         name="token"
-        onChange={handleTokenChange}
+        onChange={handleChange}
         placeholder="Введите код из письма"
         type="text"
-        value={token}
+        value={values.token}
       />
       <Button disabled={isLoading} htmlType="submit" size="medium" type="primary">
         Сохранить

@@ -1,13 +1,15 @@
 // S3.3.1: Вынести LoginPage в отдельный компонент с формой авторизации
 // S3.5 Добавить LoginPage к логике авторизации и регистрации
+// S3.9 По мотивам ревью, переделал на useForm
 import {
   Button,
   EmailInput,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { loginUser } from '@services/auth/auth-actions';
 import { selectAuthError, selectAuthIsLoading } from '@services/auth/auth-slice';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
@@ -19,29 +21,17 @@ export const LoginPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const error = useAppSelector(selectAuthError);
   const isLoading = useAppSelector(selectAuthIsLoading);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleEmailChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setEmail(event.target.value);
-    },
-    []
-  );
-
-  const handlePasswordChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setPassword(event.target.value);
-    },
-    []
-  );
+  const { values, handleChange } = useForm({
+    email: '',
+    password: '',
+  });
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
       event.preventDefault();
-      void dispatch(loginUser({ email, password }));
+      void dispatch(loginUser(values));
     },
-    [dispatch, email, password]
+    [dispatch, values]
   );
 
   return (
@@ -51,16 +41,16 @@ export const LoginPage = (): React.JSX.Element => {
       <EmailInput
         extraClass="mb-6"
         name="email"
-        onChange={handleEmailChange}
+        onChange={handleChange}
         placeholder="E-mail"
-        value={email}
+        value={values.email}
       />
       <PasswordInput
         extraClass="mb-6"
         name="password"
-        onChange={handlePasswordChange}
+        onChange={handleChange}
         placeholder="Пароль"
-        value={password}
+        value={values.password}
       />
       <Button disabled={isLoading} htmlType="submit" size="medium" type="primary">
         Войти

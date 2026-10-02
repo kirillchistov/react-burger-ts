@@ -1,121 +1,138 @@
-# Описание проектной работы (Спринт 1)
+# Обзор проекта
 
-В этой проектной работе нужно:
-- Реализовать вёрстку компонентов BurgerIngredients и BurgerConstructor с кастомным скроллбаром и адаптивной высотой блоков.
-- Подключиться к API, чтобы получать данные об ингредиентах; обрабатывать возможные ошибки и отображать прелоадер во время загрузки.
-- Внедрить модальные окна, чтобы описывать ингредиенты, оформлять заказ и закрывать окна по клику и нажатию на клавишу Esc с использованием порталов.
-- Вынести содержимое модальных окон в отдельные компоненты OrderDetails и IngredientDetails.
+Stellar Burgers — клиентское React-приложение для сборки бургера и оформления заказа.
+Учебный проект курса «Middle Front-end + React-разработчик».
+Реализованы спринты 1–3. Собирается как Vite SPA.
 
-## 1. Вёрстка первого экрана проекта
+> Схема: [`project-overview.svg`](./project-overview.svg)
 
-Задача — реализовать окончательную вёрстку компонентов BurgerIngredients и BurgerConstructor.
+Брифы заданий: [спринт 1](./checklist-1.md), [спринт 2](./sprint2.md), [спринт 3](./sprint3.md). Чек-листы: [2](./checklist-2.md), [3](./checklist-3.md). Архитектура: [`project-architecture.md`](./project-architecture.md).
 
-### BurgerIngredients
+## Что делает приложение
 
-Этот компонент в окончательном варианте должен выглядеть так:
-https://pictures.s3.yandex.net/resources/image_1765450094.png
-Скриншот с реализованным компонентом BurgerIngredients. Он состоит из разделов «Булки», «Соусы» и «Начинки».
+- Загружает ингредиенты из Norma API (`GET /ingredients`).
+- Показывает каталог с вкладками «Булки / Соусы / Начинки» и подсветкой ближайшего заголовка при скролле.
+- Позволяет собрать бургер drag-and-drop: булка заменяется, начинки добавляются, сортируются и удаляются.
+- Считает стоимость и счётчики на карточках мемоизированными селекторами.
+- Оформляет заказ (`POST /orders` с `authorization`) только у авторизованного пользователя и показывает номер в модалке.
+- После закрытия попапа с номером очищает конструктор.
+- Маршрутизирует экраны через `BrowserRouter`: главная, ингредиент, auth-формы, профиль, заглушки ленты и 404.
+- Хранит JWT в `localStorage`, обновляет access-токен через `fetchWithRefresh`.
 
-Из библиотеки UI-компонентов возьмите следующие:
--- [счётчики](https://react-burger-ui-components.education-services.ru/?path=/docs/components-counter--docs),
--- [иконки](https://react-burger-ui-components.education-services.ru/?path=/docs/components-icons--docs),
--- [типографику](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-typography--docs),
--- [систему отступов](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-box--docs).
+Пока не сделано: живая лента заказов, история заказов пользователя, WebSocket, SSR.
 
-У компонента свой кастомизированный скроллбар, используйте для него CSS-класс custom-scroll из библиотеки. Подумайте над реализацией и возможным ограничением высоты блока, в том числе и для разных разрешений экранов.
+## Верхнеуровневая структура
 
-### BurgerConstructor
-Этот компонент должен выглядеть так:
-https://pictures.s3.yandex.net/resources/image_1765450154.png
-Скриншот с реализованным компонентом BurgerConstructor.
+```text
+.
+├── docs/                     # Задания, чек-листы, обзор и схемы
+├── public/                   # Статические файлы Vite
+├── src/
+│   ├── components/           # UI: шапка, конструктор, модалки, ProtectedRoute
+│   ├── pages/                # Страницы маршрутов
+│   ├── services/             # Redux: store, слайсы, thunks, хуки
+│   └── utils/                # API, auth storage, константы, типы, DnD
+├── index.html                # HTML-оболочка, узел #modals
+├── vite.config.ts            # Vite, алиасы, Vitest, base для GH Pages
+└── package.json              # Скрипты и зависимости
+```
 
-Из библиотеки UI-компонентов возьмите следующие:
--- [элементы списка](https://react-burger-ui-components.education-services.ru/?path=/docs/components-constructorelement--docs),
--- [иконки](https://react-burger-ui-components.education-services.ru/?path=/docs/components-icons--docs),
--- [кнопку](https://react-burger-ui-components.education-services.ru/?path=/docs/components-button--docs),
--- [типографику](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-typography--docs),
--- [систему отступов](https://react-burger-ui-components.education-services.ru/?path=/docs/styles-box--docs).
+## Поток запуска
 
-Отображение списка организуйте самостоятельно. Подумайте над реализацией и возможным ограничением высоты блока, в том числе и для разных разрешений экранов. Скроллбар не распространяется на заблокированные позиции конструктора и должен быть кастомизирован с помощью библиотечного CSS-класса custom-scroll.
+```mermaid
+flowchart TD
+  Browser[Браузер] --> Html[index.html]
+  Html --> Bootstrap[src/main.tsx]
+  Bootstrap --> Providers[Redux Provider + BrowserRouter]
+  Providers --> App[src/components/app/app.tsx]
+  App --> Fetch[fetchIngredients]
+  App --> GetUser[getUser]
+  App --> Header[AppHeader NavLink]
+  App --> Routes[Routes]
+  Routes --> Home["/ Home + DndProvider"]
+  Routes --> Pages[остальные страницы]
+```
 
-Помните, что constructor — зарезервированное слово в JavaScript. Если использовать его для именования сущностей в проекте, это может привести к коллизии имён, ошибкам и багам. Потому рекомендуем не употреблять слово constructor для нейминга. Название burgerConstructor будет приемлемым.
+## Основные пользовательские потоки
 
-### Несколько советов по вёрстке
-Вы изучаете React, но базовые правила семантики вёрстки остаются актуальными. Чтобы им следовать, рекомендуем:
--- использовать семантические HTML5-элементы, которые точно располагаются на главной странице: header, nav, main, section;
--- оформлять повторяющиеся элементы в неупорядоченные списки;
--- стараться не использовать элемент div. Он подходит исключительно для того, чтобы упаковать несколько блоков с последующей стилизацией их и построением сетки.
+### Конструктор бургера
 
-## 2. Подключение к API
+```mermaid
+flowchart LR
+  Card[Карточка ингредиента] --> Drag[useDrag]
+  Drag --> Drop[Drop в конструктор]
+  Drop --> Add[addIngredient]
+  Add --> CtorSlice[burgerConstructor slice]
+  CtorSlice --> UI[UI конструктора]
+  UI --> Submit[Оформить заказ]
+  Submit --> Auth{user?}
+  Auth -- нет --> Login["/login"]
+  Auth -- да --> OrderApi["POST /orders"]
+  OrderApi --> Modal[Модалка с номером]
+  Modal --> Close[Закрытие попапа]
+  Close --> Clear[clearConstructor]
+```
 
-До этого в приложении вы использовали захардкоженные данные. Пришло время заменить их на реальные. Для этого вам понадобятся данные об ингредиентах. Получить их можно, обратившись к нашему API:
- https://new-stellarburgers.education-services.ru/api/ingredients 
+### Ингредиент и модалки
 
-Запрос к API должен происходить при монтировании компонента App. А для получения и сохранения данных воспользуйтесь нужными хуками.
+```mermaid
+flowchart TD
+  ClickCard[Клик по карточке] --> Path["/ingredients/:id + background"]
+  Path --> IngredientModal[Modal + IngredientDetails поверх Home]
+  Direct[Прямой заход / refresh] --> IngredientPage[IngredientPage]
 
-Особенности реализации:
--- Для выполнения запросов можно использовать функцию fetch или библиотеку axios.
--- URL-адрес домена вынесите в отдельную константу и поместите в отдельный файл для констант в папке utils.
--- Если при выполнении запроса к API произошли ошибки, нужно их обработать.
--- Прежде чем использовать данные в компонентах, необходимо дождаться завершения запроса. Пока запрос выполняется, отображайте компонент Preloader из UI-библиотеки.
+  OrderBtn[Оформить заказ] --> Create[createOrder thunk]
+  Create --> OrderModal[Modal: прелоадер / ошибка / OrderDetails]
+  OrderModal --> CloseOrder[clearOrder + clearConstructor при успехе]
+```
 
-Полученные данные используйте в компонентах BurgerConstructor и BurgerIngredients. 
+### Auth и профиль
 
-## 3. Модальные окна
+```mermaid
+flowchart TD
+  Guest[Гость на /profile] --> Login["/login + from"]
+  LoginForm[login / register] --> Tokens[localStorage]
+  Tokens --> Back[Navigate на from или /]
+  Forgot[forgot-password] --> Flag[флаг в localStorage]
+  Flag --> Reset["/reset-password"]
+  Profile[профиль] --> Save[PATCH /auth/user]
+  Profile --> Logout[POST /auth/logout]
+  Logout --> LoginAgain["/login"]
+```
 
-В проектной работе используется несколько модальных окон: для оформленного заказа, детальной информации об ингредиенте и детального состава заказа. 
+## Источники данных
 
-Эти модальные окна объединяет общая логика: функциональность открытия/закрытия и дизайн. Общую функциональность вынесите в компоненты модального окна:
+| Источник | Для чего используется | Основные файлы |
+| --- | --- | --- |
+| REST API | Ингредиенты, заказ, register/login/logout/token/user, сброс пароля | `src/utils/burger-api.ts`, `src/utils/constants.ts` |
+| localStorage | `accessToken`, `refreshToken`, флаг reset-password | `src/utils/auth.ts` |
+| Redux store | Auth, ингредиенты, конструктор, текущий ингредиент, заказ | `src/services/store.ts`, слайсы в `src/services/*` |
+| React Router | Экраны, модальный фон ингредиента, protected routes | `src/main.tsx`, `src/components/app/app.tsx` |
+| React DnD | Перетаскивание в конструктор и сортировка начинок | `src/utils/dnd.ts`, `src/pages/home/home.tsx` |
 
--- Modal — компонент самого модального окна: шапка с заголовком и иконка закрытия.
-https://pictures.s3.yandex.net/resources/image_1765450180.png
-Скриншот с модальным окном «Детали ингредиента».
+## Важные замечания по текущей реализации
 
--- ModalOverlay — фоновая подложка под модальным окном.
+- CSR SPA. `BrowserRouter` + `basename` из `BASE_URL` (на GH Pages это `/react-burger-ts`).
+- Заказ только с авторизацией. Тело: `[bunId, ...fillingIds, bunId]`.
+- `fetchWithRefresh`: при `jwt expired` — `POST /auth/token`, повтор исходного запроса.
+- Redux DevTools включены только в `import.meta.env.DEV`.
+- `/feed` и `/profile/orders` — заглушки до спринта с WebSocket.
+- Деплой на GitHub Pages: https://kirillchistov.github.io/react-burger-ts/
 
-Открытие модального окна:
--- Модальное окно открывается по клику на соответствующий элемент страницы.
--- Клик по ингредиенту открывает модальное окно с описанием ингредиента.
--- Клик по кнопке «Оформить заказ» открывает модальное окно с описанием заказа.
+## Спринты
 
-Закрытие модального окна:
--- Клик по иконке крестика закрывает модальное окно.
--- Клик по ModalOverlay или нажатие на клавишу Esc закрывают модальное окно.
+### Спринт 1
 
-Компонент модального окна будет использоваться внутри компонентов с overflow: hidden, поэтому для реализации модальных окон воспользуйтесь порталом. О порталах вы узнаете ближе к концу спринта. Из UI-библиотеки используйте типографику и иконки.
+- [x] Список ингредиентов с сервера, прелоадер и обработка ошибок
+- [x] Конструктор, стоимость, кастомный скролл
+- [x] Модалки ингредиента и заказа (портал, Esc, оверлей)
 
-Обратите внимание, что компонент ModalOverlay — это простая универсальная подложка, поэтому у неё не может быть дочерних компонентов.
+### Спринт 2
 
-Теперь поговорим о содержимом модальных окон.
+- [x] Табы ингредиентов, Redux, заказ, DnD, счётчики и цена
 
-## 4. Содержимое модальных окон
-Вынесите содержимое двух модальных окон в разные компоненты: OrderDetails и IngredientDetails. Вот как они выглядят:
-https://pictures.s3.yandex.net/resources/image_1765450207_1765530616.png
-https://pictures.s3.yandex.net/resources/image_1765450230_1765530631.png
+### Спринт 3
 
-Для каждого модального окна возьмите из UI-библиотеки [типографику](https://react-burger-ui-components.practicum.com.ru/?path=/docs/styles-typography--docs) и [иконки](https://react-burger-ui-components.practicum.com.ru/?path=/docs/components-icons--docs).
-
-Компонент IngredientDetails содержит данные, которые получены от API. Это значит, что при клике на ингредиент открывается модальное окно с описанием конкретного ингредиента.
-
-Компонент OrderDetails содержит тестовые данные. Вы ещё не реализовали функциональность создания заказа, поэтому используйте тексты из макета. В дальнейшем номер заказа и другие данные будут приходить с сервера, но подумать о месте для хранения тестовых данных нужно уже сейчас.
-
-## 5. Типизация
-Пока вы выполняли задания, у вас появились новые компоненты. Большинство из них принимают пропсы. А все пропсы надо валидировать. Если вы используете TypeScript, опишите типы для объекта с пропсами каждого компонента и расположите их в том же файле соответствующего компонента непосредственно перед ним.
-
-# Спринт 2
-
-[x] Доработка интерфейса навигации по ингредиентам
-[x] Перенос получения массива ингредиентов в Redux через thunk
-[x] Перенос состояния модального окна выбора ингредиента в Redux
-[x] Запрос на создание заказа (POST / orders)
-[x] Создание первых экшенов и редьюсеров
-[x] Реализация перетаскивания ингредиентов
-[x] Удаление ингредиентов из конструктора
-[x] Вложенная сортировка ингредиентов в конструкторе
-[x] Подсчёт количества добавленных ингредиентов
-[x] Подсчёт общей стоимости заказа
-[x] Хранение состава конструктора в Redux
-
-- [Обзор](./project-overview-s2.md), 
-- [Архитектура](./project-architecture.old.md), 
-- [Чек-лист спринта](./sprint2.md).
+- [x] Роутинг, страница и модалка ингредиента
+- [x] Вёрстка login/register/forgot/reset/profile/feed/404
+- [x] Auth API, `ProtectedRoute`, профиль save/cancel, заказ только с токеном

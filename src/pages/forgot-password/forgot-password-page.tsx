@@ -1,9 +1,11 @@
 // S3.3.2: Страница forgot-password с формой восстановления пароля
 // S3.6.1: Восстановление пароля: запрос, флаг в localStorage, переход на /reset-password
+// S3.9 По мотивам ревью, переделал на useForm
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { forgotPassword } from '@services/auth/auth-actions';
 import { useAppDispatch } from '@services/hooks';
 import { setResetPasswordAllowed } from '@utils/auth';
@@ -14,16 +16,11 @@ import styles from '../auth/auth-form.module.css';
 export const ForgotPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const { values, handleChange } = useForm({
+    email: '',
+  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleEmailChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setEmail(event.target.value);
-    },
-    []
-  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
@@ -31,7 +28,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
       setError(null);
       setIsLoading(true);
 
-      void dispatch(forgotPassword(email))
+      void dispatch(forgotPassword(values.email))
         .unwrap()
         .then((): void => {
           setResetPasswordAllowed(true);
@@ -44,7 +41,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
           setIsLoading(false);
         });
     },
-    [dispatch, email, navigate]
+    [dispatch, navigate, values.email]
   );
 
   return (
@@ -56,9 +53,9 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
       <EmailInput
         extraClass="mb-6"
         name="email"
-        onChange={handleEmailChange}
+        onChange={handleChange}
         placeholder="Укажите e-mail"
-        value={email}
+        value={values.email}
       />
       <Button disabled={isLoading} htmlType="submit" size="medium" type="primary">
         Восстановить
