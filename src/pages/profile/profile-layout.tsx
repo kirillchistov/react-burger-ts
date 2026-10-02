@@ -26,30 +26,28 @@ export const ProfileLayout = (): React.JSX.Element => {
       <nav className={styles.menu}>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
+            `${styles.link} ${isActive ? styles.linkActive : ''}`
           }
           end
           to={ROUTES.PROFILE}
         >
-          Профиль
+          <span className="text text_type_main-medium">Профиль</span>
         </NavLink>
         <NavLink
           className={({ isActive }): string =>
-            `${styles.link} text text_type_main-medium ${isActive ? styles.linkActive : ''}`
+            `${styles.link} ${isActive ? styles.linkActive : ''}`
           }
           to={ROUTES.PROFILE_ORDERS}
         >
-          История заказов
+          <span className="text text_type_main-medium">История заказов</span>
         </NavLink>
-        <button
-          className={`${styles.link} text text_type_main-medium`}
-          onClick={handleLogout}
-          type="button"
-        >
-          Выход
+        <button className={styles.link} onClick={handleLogout} type="button">
+          <span className="text text_type_main-medium">Выход</span>
         </button>
-        <p className={`${styles.hint} text text_type_main-default text_color_inactive`}>
-          В этом разделе вы можете изменить свои персональные данные
+        <p className={styles.hint}>
+          <span className="text text_type_main-default text_color_inactive">
+            В этом разделе вы можете изменить свои персональные данные
+          </span>
         </p>
       </nav>
       <div className={styles.content}>
