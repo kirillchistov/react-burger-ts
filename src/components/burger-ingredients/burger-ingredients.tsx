@@ -7,13 +7,9 @@ import { selectIngredientCounts } from '@services/burger-constructor/burger-cons
 import { useAppSelector } from '@services/hooks';
 import { selectIngredients } from '@services/ingredients/ingredients-slice';
 
-import type { TIngredient, TIngredientType } from '@utils/types';
+import type { TIngredientType } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
-
-type TBurgerIngredientsProps = {
-  onIngredientClick: (ingredient: TIngredient) => void;
-};
 
 const ingredientGroups: readonly { label: string; type: TIngredientType }[] = [
   { type: 'bun', label: 'Булки' },
@@ -24,9 +20,7 @@ const ingredientGroups: readonly { label: string; type: TIngredientType }[] = [
 const isIngredientType = (value: string): value is TIngredientType =>
   value === 'bun' || value === 'sauce' || value === 'main';
 
-export const BurgerIngredients = ({
-  onIngredientClick,
-}: TBurgerIngredientsProps): React.JSX.Element => {
+export const BurgerIngredients = (): React.JSX.Element => {
   const ingredients = useAppSelector(selectIngredients);
   const counts = useAppSelector(selectIngredientCounts);
   const [currentTab, setCurrentTab] = useState<TIngredientType>('bun');
@@ -119,7 +113,7 @@ export const BurgerIngredients = ({
         {groupedIngredients.map(({ type, label, items }) => (
           <section key={type} className={styles.group}>
             <h2
-              className={`${styles.title} text text_type_main-medium`}
+              className={`${styles.title} text text_type_main-medium mb-6`}
               ref={(element) => {
                 titleRefs.current[type] = element;
               }}
@@ -132,7 +126,6 @@ export const BurgerIngredients = ({
                   key={ingredient._id}
                   count={counts[ingredient._id]}
                   ingredient={ingredient}
-                  onClick={onIngredientClick}
                 />
               ))}
             </ul>

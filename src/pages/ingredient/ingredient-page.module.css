@@ -1,0 +1,18 @@
+.page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  padding: 120px 16px 40px;
+}
+
+.status {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
