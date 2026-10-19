@@ -1,4 +1,6 @@
-// S3.5 Экшены для регистрации, входа, выхода, получения и обновления пользователя
+/* S4.1 Тела auth запросов убрал в src/utils/types.ts, 
+уменьшил, дублирование, подключил в API и thunks */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { clearTokens, getRefreshToken } from '@utils/auth';
@@ -13,11 +15,17 @@ import {
   updateUserApi,
 } from '@utils/burger-api';
 
-import type { TUser } from '@utils/types';
+import type {
+  TLoginData,
+  TRegisterData,
+  TResetPasswordData,
+  TUpdateUserData,
+  TUser,
+} from '@utils/types';
 
 export const registerUser = createAsyncThunk<
   TUser,
-  { email: string; name: string; password: string },
+  TRegisterData,
   { rejectValue: string }
 >('auth/register', async (payload, { rejectWithValue }) => {
   try {
@@ -27,17 +35,16 @@ export const registerUser = createAsyncThunk<
   }
 });
 
-export const loginUser = createAsyncThunk<
-  TUser,
-  { email: string; password: string },
-  { rejectValue: string }
->('auth/login', async (payload, { rejectWithValue }) => {
-  try {
-    return await loginApi(payload);
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, 'Не удалось войти'));
+export const loginUser = createAsyncThunk<TUser, TLoginData, { rejectValue: string }>(
+  'auth/login',
+  async (payload, { rejectWithValue }) => {
+    try {
+      return await loginApi(payload);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, 'Не удалось войти'));
+    }
   }
-});
+);
 
 export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   'auth/logout',
@@ -68,7 +75,7 @@ export const getUser = createAsyncThunk<TUser | null, void, { rejectValue: strin
 
 export const updateUser = createAsyncThunk<
   TUser,
-  { email: string; name: string; password?: string },
+  TUpdateUserData,
   { rejectValue: string }
 >('auth/updateUser', async (payload, { rejectWithValue }) => {
   try {
@@ -91,7 +98,7 @@ export const forgotPassword = createAsyncThunk<void, string, { rejectValue: stri
 
 export const resetPassword = createAsyncThunk<
   void,
-  { password: string; token: string },
+  TResetPasswordData,
   { rejectValue: string }
 >('auth/resetPassword', async (payload, { rejectWithValue }) => {
   try {
