@@ -1,6 +1,4 @@
-// S3.1 Вынести в Home меню ингредиентов, конструктор заказа, DndProvider
-// S3.7 Защищенный маршрут для Home (гость с заказом → /login + from)
-import { Preloader } from '@krgaa/react-developer-burger-ui-components';
+/* S4.2 2: Собрать один тип состояния маршрута TLocationState */ import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -30,6 +28,8 @@ import {
 } from '@services/order/order-slice';
 import { ROUTES } from '@utils/constants';
 
+import type { TLocationState } from '@utils/types';
+
 import styles from './home.module.css';
 
 export const Home = (): React.JSX.Element => {
@@ -47,7 +47,9 @@ export const Home = (): React.JSX.Element => {
 
   const handleOpenOrderModal = useCallback((): void => {
     if (!user) {
-      void navigate(ROUTES.LOGIN, { state: { from: ROUTES.HOME } });
+      void navigate(ROUTES.LOGIN, {
+        state: { from: ROUTES.HOME } satisfies TLocationState,
+      });
       return;
     }
 

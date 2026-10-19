@@ -1,5 +1,8 @@
 /* S4.1 Тела auth запросов убрал в src/utils/types.ts, 
 уменьшил, дублирование, подключил в API и thunks */
+/* S4.2 Собрать один тип состояния маршрута TLocationState */
+
+import type { Location } from 'react-router-dom';
 export type TIngredientType = 'bun' | 'main' | 'sauce';
 
 export type TIngredient = {
@@ -47,4 +50,9 @@ export type TUpdateUserData = TUser & {
 export type TResetPasswordData = {
   password: string;
   token: string;
+};
+
+export type TLocationState = {
+  background?: Location;
+  from?: string;
 };
