@@ -1,4 +1,4 @@
-/* S4.2 2: Собрать один тип состояния маршрута TLocationState */ import { Preloader } from '@krgaa/react-developer-burger-ui-components';
+/* S4.2 Собрать один тип состояния маршрута TLocationState */ import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
