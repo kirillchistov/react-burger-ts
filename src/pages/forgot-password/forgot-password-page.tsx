@@ -1,13 +1,16 @@
-// S3.3.2: Страница forgot-password с формой восстановления пароля
-// S3.6.1: Восстановление пароля: запрос, флаг в localStorage, переход на /reset-password
-// S3.9 По мотивам ревью, переделал на useForm
+// S4.5 Страница forgot-password с формой восстановления пароля
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useForm } from '@hooks/useForm';
 import { forgotPassword } from '@services/auth/auth-actions';
-import { useAppDispatch } from '@services/hooks';
+import {
+  clearAuthError,
+  selectAuthError,
+  selectAuthIsLoading,
+} from '@services/auth/auth-slice';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { setResetPasswordAllowed } from '@utils/auth';
 import { ROUTES } from '@utils/constants';
 
@@ -16,30 +19,28 @@ import styles from '../auth/auth-form.module.css';
 export const ForgotPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const error = useAppSelector(selectAuthError);
+  const isLoading = useAppSelector(selectAuthIsLoading);
   const { values, handleChange } = useForm({
     email: '',
   });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
       event.preventDefault();
-      setError(null);
-      setIsLoading(true);
 
-      void dispatch(forgotPassword(values.email))
-        .unwrap()
-        .then((): void => {
-          setResetPasswordAllowed(true);
-          void navigate(ROUTES.RESET_PASSWORD);
-        })
-        .catch((message: string): void => {
-          setError(message);
-        })
-        .finally((): void => {
-          setIsLoading(false);
-        });
+      void dispatch(forgotPassword(values.email)).then((result): void => {
+        if (!forgotPassword.fulfilled.match(result)) {
+          return;
+        }
+
+        setResetPasswordAllowed(true);
+        void navigate(ROUTES.RESET_PASSWORD);
+      });
     },
     [dispatch, navigate, values.email]
   );
