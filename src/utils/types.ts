@@ -1,5 +1,8 @@
-// S3.3 Типы для Burger API
-// S3.5 Типы для токенов Авторизации
+/* S4.1 Тела auth запросов убрал в src/utils/types.ts, 
+уменьшил, дублирование, подключил в API и thunks */
+/* S4.2 Собрать один тип состояния маршрута TLocationState */
+
+import type { Location } from 'react-router-dom';
 export type TIngredientType = 'bun' | 'main' | 'sauce';
 
 export type TIngredient = {
@@ -29,4 +32,27 @@ export type TUser = {
 export type TAuthTokens = {
   accessToken: string;
   refreshToken: string;
+};
+
+export type TLoginData = {
+  email: string;
+  password: string;
+};
+
+export type TRegisterData = TLoginData & {
+  name: string;
+};
+
+export type TUpdateUserData = TUser & {
+  password?: string;
+};
+
+export type TResetPasswordData = {
+  password: string;
+  token: string;
+};
+
+export type TLocationState = {
+  background?: Location;
+  from?: string;
 };

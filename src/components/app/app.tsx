@@ -1,11 +1,4 @@
-// S3.1: Вынести Home в отдельный компонент с шапкой и использовать его в App.tsx
-// S3.2: Маршрут страницы ингредиента и модалки по location.state.background
-// S3.3.1: Маршруты для LoginPage, RegisterPage
-// S3.3.2: Маршруты для ForgotPasswordPage, ResetPasswordPage
-// S3.3.3: Маршруты для ProfileLayout, ProfilePage
-// S3.3.4: Маршруты для ProfileOrdersPage, FeedPage
-// S3.3.5: Маршруты для NotFoundPage
-// S3.7 Маршруты для ProtectedRoute (getUser при старте)
+/* S4.2 2: Собрать один тип состояния маршрута TLocationState */
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
@@ -27,13 +20,9 @@ import { useAppDispatch } from '@services/hooks';
 import { fetchIngredients } from '@services/ingredients/ingredients-actions';
 import { ROUTES } from '@utils/constants';
 
-import type { Location } from 'react-router-dom';
+import type { TLocationState } from '@utils/types';
 
 import styles from './app.module.css';
-
-type TLocationState = {
-  background?: Location;
-};
 
 export const App = (): React.JSX.Element => {
   const dispatch = useAppDispatch();

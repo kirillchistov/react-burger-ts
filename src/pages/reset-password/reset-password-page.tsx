@@ -1,17 +1,20 @@
-// S3.3.2: Страница reset-password с формой сброса пароля
-// S3.6.2: Сброс: запрос -> флаг, успех -> переход на /login, нет -> на /forgot-password
-// S3.9 По мотивам ревью, переделал на useForm
+// S4.6 Страница reset-password с формой сброса пароля
 import {
   Button,
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 import { useForm } from '@hooks/useForm';
 import { resetPassword } from '@services/auth/auth-actions';
-import { useAppDispatch } from '@services/hooks';
+import {
+  clearAuthError,
+  selectAuthError,
+  selectAuthIsLoading,
+} from '@services/auth/auth-slice';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { isResetPasswordAllowed, setResetPasswordAllowed } from '@utils/auth';
 import { ROUTES } from '@utils/constants';
 
@@ -20,31 +23,29 @@ import styles from '../auth/auth-form.module.css';
 export const ResetPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const error = useAppSelector(selectAuthError);
+  const isLoading = useAppSelector(selectAuthIsLoading);
   const { values, handleChange } = useForm({
     password: '',
     token: '',
   });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
       event.preventDefault();
-      setError(null);
-      setIsLoading(true);
 
-      void dispatch(resetPassword(values))
-        .unwrap()
-        .then((): void => {
-          setResetPasswordAllowed(false);
-          void navigate(ROUTES.LOGIN);
-        })
-        .catch((message: string): void => {
-          setError(message);
-        })
-        .finally((): void => {
-          setIsLoading(false);
-        });
+      void dispatch(resetPassword(values)).then((result): void => {
+        if (!resetPassword.fulfilled.match(result)) {
+          return;
+        }
+
+        setResetPasswordAllowed(false);
+        void navigate(ROUTES.LOGIN);
+      });
     },
     [dispatch, navigate, values]
   );
