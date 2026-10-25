@@ -1,4 +1,4 @@
-// S3.7 Компонент защищенного маршрута (onlyUnAuth, сохранение from)
+/* S4.2 2: Собрать один тип состояния маршрута TLocationState */
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { Navigate, useLocation } from 'react-router-dom';
 
@@ -6,13 +6,11 @@ import { selectIsAuthChecked, selectUser } from '@services/auth/auth-slice';
 import { useAppSelector } from '@services/hooks';
 import { ROUTES } from '@utils/constants';
 
+import type { TLocationState } from '@utils/types';
+
 type TProtectedRouteProps = {
   children: React.JSX.Element;
   onlyUnAuth?: boolean;
-};
-
-type TLocationState = {
-  from?: string;
 };
 
 export const ProtectedRoute = ({
@@ -33,7 +31,13 @@ export const ProtectedRoute = ({
   }
 
   if (!onlyUnAuth && !user) {
-    return <Navigate replace state={{ from: location.pathname }} to={ROUTES.LOGIN} />;
+    return (
+      <Navigate
+        replace
+        state={{ from: location.pathname } satisfies TLocationState}
+        to={ROUTES.LOGIN}
+      />
+    );
   }
 
   return children;

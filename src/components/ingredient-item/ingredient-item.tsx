@@ -1,4 +1,4 @@
-// S3.2: Вынести IngredientItem в отдельный компонент с DnD и модальным окном
+/* S4.2 2: Собрать один тип состояния маршрута TLocationState */
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback } from 'react';
 import { useDrag } from 'react-dnd';
@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getIngredientPath } from '@utils/constants';
 import { DND_TYPES } from '@utils/dnd';
 
-import type { TIngredient } from '@utils/types';
+import type { TIngredient, TLocationState } from '@utils/types';
 
 import styles from './ingredient-item.module.css';
 
@@ -32,7 +32,7 @@ export const IngredientItem = ({
 
   const handleClick = useCallback((): void => {
     void navigate(getIngredientPath(ingredient._id), {
-      state: { background: location },
+      state: { background: location } satisfies TLocationState,
     });
   }, [ingredient._id, location, navigate]);
 

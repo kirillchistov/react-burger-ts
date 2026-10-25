@@ -1,10 +1,17 @@
-// S3.3 Burger API - Основные функции
-// S3.5 Burger API - Обновление токенов Авторизации, Обработка ошибок
-// S3.6 Burger API - Запрос на восстановление пароля, Сброс пароля
+/* S4.1 Тела auth запросов убрал в src/utils/types.ts, 
+уменьшил, дублирование, подключил в API и thunks */
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@utils/auth';
 import { BURGER_API_URL } from '@utils/constants';
 
-import type { TAuthTokens, TIngredient, TUser } from '@utils/types';
+import type {
+  TAuthTokens,
+  TIngredient,
+  TLoginData,
+  TRegisterData,
+  TResetPasswordData,
+  TUpdateUserData,
+  TUser,
+} from '@utils/types';
 
 type TServerResponse<T> = {
   success: boolean;
@@ -156,11 +163,7 @@ export const createOrderApi = (ingredientIds: string[]): Promise<number> =>
     return Promise.reject(new Error(orderErrorMessage));
   });
 
-export const registerApi = (data: {
-  email: string;
-  name: string;
-  password: string;
-}): Promise<TUser> =>
+export const registerApi = (data: TRegisterData): Promise<TUser> =>
   fetch(`${BURGER_API_URL}/auth/register`, {
     body: JSON.stringify(data),
     headers: jsonHeaders,
@@ -176,7 +179,7 @@ export const registerApi = (data: {
       return Promise.reject(new Error('Не удалось зарегистрироваться'));
     });
 
-export const loginApi = (data: { email: string; password: string }): Promise<TUser> =>
+export const loginApi = (data: TLoginData): Promise<TUser> =>
   fetch(`${BURGER_API_URL}/auth/login`, {
     body: JSON.stringify(data),
     headers: jsonHeaders,
@@ -237,11 +240,7 @@ export const getUserApi = (): Promise<TUser> =>
     return Promise.reject(new Error('Не удалось получить данные пользователя'));
   });
 
-export const updateUserApi = (data: {
-  email: string;
-  name: string;
-  password?: string;
-}): Promise<TUser> =>
+export const updateUserApi = (data: TUpdateUserData): Promise<TUser> =>
   fetchWithRefresh<TUserResponse>(`${BURGER_API_URL}/auth/user`, {
     body: JSON.stringify(
       data.password !== undefined && data.password.length > 0
@@ -276,10 +275,7 @@ export const forgotPasswordApi = (email: string): Promise<void> =>
       return Promise.reject(new Error('Не удалось отправить письмо'));
     });
 
-export const resetPasswordApi = (data: {
-  password: string;
-  token: string;
-}): Promise<void> =>
+export const resetPasswordApi = (data: TResetPasswordData): Promise<void> =>
   fetch(`${BURGER_API_URL}/password-reset/reset`, {
     body: JSON.stringify(data),
     headers: jsonHeaders,
