@@ -20,6 +20,11 @@ export const isOrderStatus = (value: unknown): value is TOrderStatus =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
+export const INVALID_TOKEN_MESSAGE = 'Invalid or missing token';
+
+export const isInvalidTokenMessage = (value: unknown): boolean =>
+  isRecord(value) && value.message === INVALID_TOKEN_MESSAGE;
+
 export const isOrder = (value: unknown): value is TOrder => {
   if (!isRecord(value)) {
     return false;

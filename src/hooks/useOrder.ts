@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { selectFeedOrders } from '@services/feed/feed-slice';
 import { useAppSelector } from '@services/hooks';
+import { selectProfileOrders } from '@services/profile-orders/profile-orders-slice';
 import { getErrorMessage, getOrderByIdApi } from '@utils/burger-api';
 import { findMockOrder } from '@utils/mock-orders';
 
@@ -14,8 +15,12 @@ type TUseOrderResult = {
 };
 
 export const useOrder = (id: string | undefined): TUseOrderResult => {
-  const orders = useAppSelector(selectFeedOrders);
-  const feedOrder = id ? (orders.find((item) => item._id === id) ?? null) : null;
+  const feedOrders = useAppSelector(selectFeedOrders);
+  const profileOrders = useAppSelector(selectProfileOrders);
+  const feedOrder = id ? (feedOrders.find((item) => item._id === id) ?? null) : null;
+  const profileOrder = id
+    ? (profileOrders.find((item) => item._id === id) ?? null)
+    : null;
   const [order, setOrder] = useState<TOrder | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +33,7 @@ export const useOrder = (id: string | undefined): TUseOrderResult => {
       return;
     }
 
-    const cachedOrder = feedOrder ?? findMockOrder(id);
+    const cachedOrder = feedOrder ?? profileOrder ?? findMockOrder(id);
 
     if (cachedOrder) {
       setOrder(cachedOrder);
@@ -63,7 +68,7 @@ export const useOrder = (id: string | undefined): TUseOrderResult => {
     return (): void => {
       controller.abort();
     };
-  }, [feedOrder, id]);
+  }, [feedOrder, id, profileOrder]);
 
   return { error, isLoading, order };
 };

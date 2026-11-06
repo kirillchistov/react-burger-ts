@@ -6,8 +6,26 @@ import {
   RESET_PASSWORD_FLAG_KEY,
 } from '@utils/constants';
 
+const ACCESS_TOKEN_TYPE = 'Bearer ';
+
 export const getAccessToken = (): string | null =>
   localStorage.getItem(ACCESS_TOKEN_KEY);
+
+export const getWsAccessToken = (): string | null => {
+  const accessToken = getAccessToken();
+
+  if (!accessToken) {
+    return null;
+  }
+
+  if (!accessToken.startsWith(ACCESS_TOKEN_TYPE)) {
+    return accessToken;
+  }
+
+  const token = accessToken.slice(ACCESS_TOKEN_TYPE.length);
+
+  return token.length > 0 ? token : null;
+};
 
 export const getRefreshToken = (): string | null =>
   localStorage.getItem(REFRESH_TOKEN_KEY);

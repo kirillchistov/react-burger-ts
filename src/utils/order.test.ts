@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseOrdersFeed } from './order';
+import { isInvalidTokenMessage, parseOrdersFeed } from './order';
 
 import type { TOrder } from '@utils/types';
 
@@ -35,5 +35,13 @@ describe('parseOrdersFeed', () => {
       parseOrdersFeed({ success: false, orders: [order], total: 1, totalToday: 1 })
     ).toBe(null);
     expect(parseOrdersFeed({ message: 'Invalid or missing token' })).toBe(null);
+  });
+
+  it('узнаёт ответ сокета с устаревшим токеном', () => {
+    expect(isInvalidTokenMessage({ message: 'Invalid or missing token' })).toBe(true);
+    expect(
+      isInvalidTokenMessage({ success: false, message: 'Invalid or missing token' })
+    ).toBe(true);
+    expect(isInvalidTokenMessage({ message: 'jwt expired' })).toBe(false);
   });
 });

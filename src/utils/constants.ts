@@ -6,6 +6,9 @@ const BURGER_WS_URL = 'wss://new-stellarburgers.education-services.ru/orders';
 
 export const FEED_WS_URL = `${BURGER_WS_URL}/all`;
 
+export const getProfileOrdersWsUrl = (accessToken: string): string =>
+  `${BURGER_WS_URL}?token=${encodeURIComponent(accessToken)}`;
+
 export const MODALS_ROOT_ID = 'modals';
 
 export const ACCESS_TOKEN_KEY = 'accessToken';
