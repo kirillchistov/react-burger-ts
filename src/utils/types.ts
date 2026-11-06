@@ -56,3 +56,15 @@ export type TLocationState = {
   background?: Location;
   from?: string;
 };
+
+export type TOrderStatus = 'created' | 'pending' | 'done';
+
+export type TOrder = {
+  _id: string;
+  ingredients: string[];
+  status: TOrderStatus;
+  name: string;
+  number: number;
+  createdAt: string;
+  updatedAt: string;
+};

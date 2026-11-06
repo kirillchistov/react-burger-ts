@@ -116,7 +116,6 @@ npm run deploy
 - [ ] Функциональность экрана «История заказов»: заменить тестовые данные сокетом `orders?token=` и обработать устаревший токен.
 - [ ] Сокеты: generic middleware и два middleware лент, закрытие соединения при уходе со страницы, устаревший токен, пропуск некорректных заказов.
 
-Обзор: [`docs/project-overview-s5.md`](docs/project-overview-s5.md). Чек-лист: [`docs/checklist-5.md`](docs/checklist-5.md).
 
 ### Маршрутизация:
 

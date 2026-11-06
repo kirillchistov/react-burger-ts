@@ -1,0 +1,25 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 280px);
+  margin: 0;
+  padding: 0 8px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 240px;
+  text-align: center;
+}
+
+@media (width <= 900px) {
+  .list {
+    max-height: none;
+  }
+}

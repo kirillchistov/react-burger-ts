@@ -1,21 +1,55 @@
-// S3.3.4: Создать заглушку FeedPage для будущей ленты заказов
-import { Link } from 'react-router-dom';
+import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 
-import { ROUTES } from '@utils/constants';
+import { OrderCard } from '@components/order-card/order-card';
+import { OrderStats } from '@components/order-stats/order-stats';
+import { useAppSelector } from '@services/hooks';
+import {
+  selectIngredients,
+  selectIngredientsError,
+  selectIngredientsIsLoading,
+} from '@services/ingredients/ingredients-slice';
+import { getFeedOrderPath } from '@utils/constants';
+import { FEED_ORDERS, FEED_TOTAL, FEED_TOTAL_TODAY } from '@utils/mock-orders';
 
-import styles from '../stub/stub-page.module.css';
+import styles from './feed-page.module.css';
 
-export const FeedPage = (): React.JSX.Element => (
-  <section className={styles.page}>
-    <h1 className="text text_type_main-medium mb-6">Лента заказов</h1>
-    <p className="text text_type_main-default text_color_inactive">
-      Страница находится в разработке
-    </p>
-    <Link
-      className={`${styles.link} text text_type_main-default mt-10`}
-      to={ROUTES.HOME}
-    >
-      Вернуться на главную
-    </Link>
-  </section>
-);
+export const FeedPage = (): React.JSX.Element => {
+  const ingredients = useAppSelector(selectIngredients);
+  const isLoading = useAppSelector(selectIngredientsIsLoading);
+  const error = useAppSelector(selectIngredientsError);
+
+  if (isLoading && ingredients.length === 0) {
+    return (
+      <div className={styles.status}>
+        <Preloader />
+      </div>
+    );
+  }
+
+  if (error && ingredients.length === 0) {
+    return <p className={`${styles.status} text text_type_main-medium`}>{error}</p>;
+  }
+
+  return (
+    <section className={styles.feed}>
+      <div className={styles.orders}>
+        <h1 className={`${styles.title} text text_type_main-large`}>Лента заказов</h1>
+        <ul className={`${styles.list} custom-scroll`}>
+          {FEED_ORDERS.map((order) => (
+            <OrderCard
+              key={order._id}
+              order={order}
+              showStatus={false}
+              to={getFeedOrderPath(order._id)}
+            />
+          ))}
+        </ul>
+      </div>
+      <OrderStats
+        orders={FEED_ORDERS}
+        total={FEED_TOTAL}
+        totalToday={FEED_TOTAL_TODAY}
+      />
+    </section>
+  );
+};

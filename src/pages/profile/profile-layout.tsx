@@ -1,6 +1,6 @@
 // S3.3.3: Вынести ProfileLayout в отдельный компонент с меню и контентом
 // S3.8: Доработка профиля: после logout переход на /login + from
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { logoutUser } from '@services/auth/auth-actions';
 import { useAppDispatch } from '@services/hooks';
@@ -11,6 +11,11 @@ import styles from './profile-layout.module.css';
 export const ProfileLayout = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isOrderHistory = location.pathname.startsWith(ROUTES.PROFILE_ORDERS);
+  const hint = isOrderHistory
+    ? 'В этом разделе вы можете просмотреть свою историю заказов'
+    : 'В этом разделе вы можете изменить свои персональные данные';
 
   const handleLogout = (): void => {
     void dispatch(logoutUser())
@@ -51,7 +56,7 @@ export const ProfileLayout = (): React.JSX.Element => {
         <p
           className={`${styles.hint} text text_type_main-default text_color_inactive mt-20`}
         >
-          В этом разделе вы можете изменить свои персональные данные
+          {hint}
         </p>
       </nav>
       <div className={styles.content}>

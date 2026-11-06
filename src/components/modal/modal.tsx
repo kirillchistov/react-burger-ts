@@ -11,6 +11,7 @@ type TModalProps = {
   children: React.ReactNode;
   onClose: () => void;
   title?: string;
+  titleClassName?: string;
 };
 
 const getModalRoot = (): HTMLElement | null => document.getElementById(MODALS_ROOT_ID);
@@ -19,6 +20,7 @@ export const Modal = ({
   children,
   onClose,
   title,
+  titleClassName = 'text text_type_main-large',
 }: TModalProps): React.JSX.Element | null => {
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent): void => {
@@ -54,7 +56,7 @@ export const Modal = ({
       >
         <div className={`${styles.header} pt-10 pr-10 pl-10`}>
           {title ? (
-            <h2 className="text text_type_main-large" id="modal-title">
+            <h2 className={titleClassName} id="modal-title">
               {title}
             </h2>
           ) : null}

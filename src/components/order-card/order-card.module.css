@@ -1,0 +1,87 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 24px;
+  color: inherit;
+  text-decoration: none;
+  background-color: #1c1c21;
+  border-radius: 40px;
+}
+
+.card:hover {
+  opacity: 0.85;
+}
+
+.header,
+.bottom,
+.price {
+  display: flex;
+  align-items: center;
+}
+
+.header,
+.bottom {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bottom {
+  margin-top: 16px;
+}
+
+.name,
+.status {
+  margin: 0;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewItem {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  margin-right: -16px;
+  overflow: hidden;
+  background-color: #131316;
+  border: 2px solid #801ab2;
+  border-radius: 50%;
+}
+
+.previewItem:last-child {
+  margin-right: 0;
+}
+
+.previewImage {
+  display: block;
+  width: 112%;
+  height: 112%;
+  object-fit: contain;
+}
+
+.more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(28 28 33 / 60%);
+  border-radius: 50%;
+}
+
+.price {
+  flex-shrink: 0;
+  gap: 8px;
+}
