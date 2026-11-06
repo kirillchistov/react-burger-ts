@@ -68,3 +68,9 @@ export type TOrder = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type TOrdersFeed = {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+};

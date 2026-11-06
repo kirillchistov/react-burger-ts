@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { selectFeedOrders } from '@services/feed/feed-slice';
+import { useAppSelector } from '@services/hooks';
 import { getErrorMessage, getOrderByIdApi } from '@utils/burger-api';
 import { findMockOrder } from '@utils/mock-orders';
 
@@ -12,19 +14,21 @@ type TUseOrderResult = {
 };
 
 export const useOrder = (id: string | undefined): TUseOrderResult => {
+  const orders = useAppSelector(selectFeedOrders);
+  const feedOrder = id ? (orders.find((item) => item._id === id) ?? null) : null;
   const [order, setOrder] = useState<TOrder | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cachedOrder = findMockOrder(id);
-
     if (!id) {
       setOrder(null);
       setError('Заказ не найден');
       setIsLoading(false);
       return;
     }
+
+    const cachedOrder = feedOrder ?? findMockOrder(id);
 
     if (cachedOrder) {
       setOrder(cachedOrder);
@@ -59,7 +63,7 @@ export const useOrder = (id: string | undefined): TUseOrderResult => {
     return (): void => {
       controller.abort();
     };
-  }, [id]);
+  }, [feedOrder, id]);
 
   return { error, isLoading, order };
 };

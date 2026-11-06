@@ -1,4 +1,4 @@
-import type { TIngredient, TOrder, TOrderStatus } from '@utils/types';
+import type { TIngredient, TOrder, TOrderStatus, TOrdersFeed } from '@utils/types';
 
 export const ORDER_STATUS_TEXT: Record<TOrderStatus, string> = {
   created: 'Создан',
@@ -41,6 +41,25 @@ export const isOrder = (value: unknown): value is TOrder => {
     typeof createdAt === 'string' &&
     typeof updatedAt === 'string'
   );
+};
+
+const isCount = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+
+export const parseOrdersFeed = (value: unknown): TOrdersFeed | null => {
+  if (!isRecord(value) || value.success !== true || !Array.isArray(value.orders)) {
+    return null;
+  }
+
+  if (!isCount(value.total) || !isCount(value.totalToday)) {
+    return null;
+  }
+
+  return {
+    orders: value.orders.filter(isOrder),
+    total: value.total,
+    totalToday: value.totalToday,
+  };
 };
 
 export type TOrderIngredient = {

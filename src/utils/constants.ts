@@ -2,6 +2,10 @@
 // S3.5 Константы для токенов Авторизации
 export const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
 
+const BURGER_WS_URL = 'wss://new-stellarburgers.education-services.ru/orders';
+
+export const FEED_WS_URL = `${BURGER_WS_URL}/all`;
+
 export const MODALS_ROOT_ID = 'modals';
 
 export const ACCESS_TOKEN_KEY = 'accessToken';
