@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { feedFailed, feedSlice, feedUpdated } from './feed-slice';
+import {
+  feedClosed,
+  feedDisconnect,
+  feedFailed,
+  feedSlice,
+  feedUpdated,
+} from './feed-slice';
 
 import type { TOrder } from '@utils/types';
 
@@ -51,5 +57,16 @@ describe('feedSlice', () => {
     expect(closed.total).toBe(5);
     expect(closed.error).toBe('Не удалось подключиться к ленте заказов');
     expect(closed.status).toBe('closed');
+  });
+
+  it('оставляет заказы на экране, когда сокет закрывают при уходе со страницы', () => {
+    const live = reducer(
+      undefined,
+      feedUpdated({ orders: [order], total: 5, totalToday: 1 })
+    );
+
+    expect(reducer(live, feedDisconnect()).orders).toEqual(live.orders);
+    expect(reducer(live, feedClosed()).orders).toEqual(live.orders);
+    expect(reducer(live, feedClosed()).error).toBeNull();
   });
 });
