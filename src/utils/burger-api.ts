@@ -2,11 +2,13 @@
 уменьшил, дублирование, подключил в API и thunks */
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@utils/auth';
 import { BURGER_API_URL } from '@utils/constants';
+import { isOrder } from '@utils/order';
 
 import type {
   TAuthTokens,
   TIngredient,
   TLoginData,
+  TOrder,
   TRegisterData,
   TResetPasswordData,
   TUpdateUserData,
@@ -43,6 +45,19 @@ type TMessageResponse = TServerResponse<{
 }>;
 
 type TRefreshResponse = TServerResponse<TAuthTokens>;
+
+type TOrderDetailsResponse = TServerResponse<{
+  order?: unknown;
+  orders?: unknown[];
+}>;
+
+const readOrderPayload = (data: { order?: unknown; orders?: unknown[] }): unknown => {
+  if (data.order !== undefined) {
+    return data.order;
+  }
+
+  return data.orders?.[0];
+};
 
 const defaultErrorMessage = 'Не удалось выполнить запрос. Попробуйте ещё раз.';
 const ingredientsErrorMessage =
@@ -289,3 +304,31 @@ export const resetPasswordApi = (data: TResetPasswordData): Promise<void> =>
 
       return Promise.reject(new Error('Не удалось сохранить новый пароль'));
     });
+
+const orderNotFoundMessage = 'Не удалось загрузить заказ';
+
+export const getOrderByIdApi = (id: string, signal?: AbortSignal): Promise<TOrder> =>
+  fetch(`${BURGER_API_URL}/orders/${id}`, { signal })
+    .then((res) => {
+      if (!res.ok) {
+        return Promise.reject(new Error(orderNotFoundMessage));
+      }
+
+      return checkResponse<TOrderDetailsResponse>(res);
+    })
+    .then((data) => {
+      const order = readOrderPayload(data);
+
+      if (data.success && isOrder(order)) {
+        return order;
+      }
+
+      return Promise.reject(new Error(orderNotFoundMessage));
+    })
+    .catch((error: unknown) =>
+      Promise.reject(
+        error instanceof Error
+          ? error
+          : new Error(getErrorMessage(error, orderNotFoundMessage))
+      )
+    );
