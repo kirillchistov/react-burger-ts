@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   feedClosed,
+  feedConnecting,
   feedDisconnect,
   feedFailed,
   feedSlice,
@@ -10,7 +11,7 @@ import {
 
 import type { TOrder } from '@utils/types';
 
-const { reducer } = feedSlice;
+const { getInitialState, reducer } = feedSlice;
 
 const order: TOrder = {
   _id: 'order-1',
@@ -23,6 +24,28 @@ const order: TOrder = {
 };
 
 describe('feedSlice', () => {
+  it('начинает с пустой ленты и статусом idle', () => {
+    expect(getInitialState()).toEqual({
+      error: null,
+      orders: [],
+      status: 'idle',
+      total: 0,
+      totalToday: 0,
+    });
+  });
+
+  it('переходит в connecting и сбрасывает ошибку', () => {
+    const failed = reducer(
+      getInitialState(),
+      feedFailed('Не удалось подключиться к ленте заказов')
+    );
+
+    expect(reducer(failed, feedConnecting())).toMatchObject({
+      error: null,
+      status: 'connecting',
+    });
+  });
+
   it('заменяет ленту целиком последним сообщением сокета', () => {
     const previous = reducer(
       undefined,
