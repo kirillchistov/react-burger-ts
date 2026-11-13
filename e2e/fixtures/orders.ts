@@ -36,3 +36,30 @@ export const feedMessage: TOrdersFeed & { success: true } = {
   total: 2231,
   totalToday: 4,
 };
+
+export const profileDoneOrder: TOrder = {
+  ...doneOrder,
+  _id: 'profile-order-done',
+};
+
+export const profilePendingOrder: TOrder = {
+  ...pendingOrder,
+  _id: 'profile-order-pending',
+};
+
+export const profileCreatedOrder: TOrder = {
+  _id: 'profile-order-created',
+  ingredients: ['bun-1', 'sauce-1', 'main-1', 'bun-1'],
+  status: 'created',
+  name: 'Краторный space бургер',
+  number: 34400,
+  createdAt: '2026-11-06T10:00:00.000Z',
+  updatedAt: '2026-11-06T10:00:05.000Z',
+};
+
+export const profileOrdersMessage: TOrdersFeed & { success: true } = {
+  success: true,
+  orders: [profileDoneOrder, profilePendingOrder, profileCreatedOrder],
+  total: 12,
+  totalToday: 3,
+};
