@@ -37,7 +37,7 @@ npm run deploy
 
 Конфиг SPA: [`deploy/nginx/react-burger.conf`](deploy/nginx/react-burger.conf) — `try_files $uri $uri/ /index.html`.
 
-Сборка и выкладка статики с Mac (корень сайта, не `/react-burger-ts/`):
+Сборка и выкладка статики с Mac (корень сайта):
 
 ```bash
 ./deploy/publish.sh
