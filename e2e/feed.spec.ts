@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { doneOrder, pendingOrder, remoteOrder } from './fixtures/orders';
-import { mockBurgerApi } from './helpers/app';
+import { gotoRoute, mockBurgerApi } from './helpers/app';
 import { mockFeedSocket, mockOrderById, openFeed } from './helpers/feed';
 
 test.describe('Лента заказов', (): void => {
@@ -74,7 +74,7 @@ test.describe('Лента заказов', (): void => {
         request.url().includes(`/api/orders/${remoteOrder._id}`)
     );
 
-    await page.goto(`/feed/${remoteOrder._id}`);
+    await gotoRoute(page, `/feed/${remoteOrder._id}`);
 
     await orderRequest;
     await expect(page.getByRole('dialog')).toHaveCount(0);

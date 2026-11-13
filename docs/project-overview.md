@@ -16,7 +16,7 @@ Stellar Burgers — клиентское React-приложение для сб�
 - Считает стоимость и счётчики на карточках мемоизированными селекторами.
 - Оформляет заказ (`POST /orders` с `authorization`) только у авторизованного пользователя и показывает номер в модалке.
 - После закрытия попапа с номером очищает конструктор.
-- Маршрутизирует экраны через `BrowserRouter`: главная, ингредиент, auth-формы, профиль, заглушки ленты и 404.
+- Маршрутизирует экраны через `HashRouter`: главная, ингредиент, auth-формы, профиль, лента и 404.
 - Хранит JWT в `localStorage`, обновляет access-токен через `fetchWithRefresh`.
 
 Пока не сделано: живая лента заказов, история заказов пользователя, WebSocket, SSR.
@@ -43,7 +43,7 @@ Stellar Burgers — клиентское React-приложение для сб�
 flowchart TD
   Browser[Браузер] --> Html[index.html]
   Html --> Bootstrap[src/main.tsx]
-  Bootstrap --> Providers[Redux Provider + BrowserRouter]
+  Bootstrap --> Providers[Redux Provider + HashRouter]
   Providers --> App[src/components/app/app.tsx]
   App --> Fetch[fetchIngredients]
   App --> GetUser[getUser]
@@ -112,7 +112,7 @@ flowchart TD
 
 ## Важные замечания по текущей реализации
 
-- CSR SPA. `BrowserRouter` + `basename` из `BASE_URL` (на GH Pages это `/react-burger-ts`).
+- CSR SPA. `HashRouter` (`#/profile`), Vite `base: '/react-burger-ts/'` на production-сборке для GH Pages.
 - Заказ только с авторизацией. Тело: `[bunId, ...fillingIds, bunId]`.
 - `fetchWithRefresh`: при `jwt expired` — `POST /auth/token`, повтор исходного запроса.
 - Redux DevTools включены только в `import.meta.env.DEV`.

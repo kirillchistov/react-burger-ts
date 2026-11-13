@@ -6,7 +6,7 @@ import {
   profileOrdersMessage,
   profilePendingOrder,
 } from './fixtures/orders';
-import { mockBurgerApi, seedAuth } from './helpers/app';
+import { gotoRoute, mockBurgerApi, seedAuth } from './helpers/app';
 import {
   FRESH_ACCESS_TOKEN,
   mockProfileOrdersSocket,
@@ -95,7 +95,7 @@ test.describe('История заказов', (): void => {
         request.method() === 'POST' && request.url().includes('/api/auth/token')
     );
 
-    await page.goto('/profile/orders');
+    await gotoRoute(page, '/profile/orders');
 
     const request = await refreshRequest;
     expect(request.postDataJSON()).toEqual({ token: SEEDED_REFRESH_TOKEN });

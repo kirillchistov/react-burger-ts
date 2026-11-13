@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { mockUser } from './fixtures/ingredients';
-import { mockBurgerApi, seedAuth } from './helpers/app';
+import { gotoRoute, mockBurgerApi, seedAuth } from './helpers/app';
 import { AUTH_PASSWORD, fillByName, mockAuthApi } from './helpers/auth';
 
 test.describe('Профиль', (): void => {
@@ -9,7 +9,7 @@ test.describe('Профиль', (): void => {
     await mockBurgerApi(page);
     await mockAuthApi(page);
     await seedAuth(page);
-    await page.goto('/profile');
+    await gotoRoute(page, '/profile');
     await expect(page.locator('input[name="name"]')).toHaveValue(mockUser.name);
   });
 

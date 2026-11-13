@@ -25,7 +25,9 @@ npm run dev
 npm run deploy
 ```
 
-Скрипт собирает `dist` с `base: '/react-burger-ts/'`, копирует `index.html` в `404.html` для SPA-переходов и публикует ветку `gh-pages`.
+`predeploy` сначала делает `vite build`. Затем `gh-pages -d dist` публикует сборку в ветку `gh-pages`. В Settings → Pages: Source «Deploy from a branch», ветка `gh-pages`, папка `/ (root)`. Исходники остаются в основной ветке; после правок в коде — коммит туда, затем снова `npm run deploy`.
+
+Скрипт собирает `dist` с `base: '/react-burger-ts/'` и публикует папку в ветку `gh-pages`. Клиентские маршруты идут через `HashRouter` (`#/profile`), поэтому GitHub Pages всегда отдаёт `index.html` и не отвечает 404 на вложенный путь.
 
 ## Спринт 1:
 
@@ -88,11 +90,11 @@ npm run deploy
 
 - [x] Покрыть тестами бизнес-логику приложения (все редьюсеры / слайсы, начальное состояние хранилища и все обработчики). Использовать Vitest.
 - [x] Настроить интеграционное тестирование с Playwright (полноценный тест всего пути пользователя для функциональности страницы «Конструктор»: перетаскивание ингредиента, создание заказа, работу модальных окон на странице «Конструктор»).
-- [ ] Деплой приложения (получить грант на Yandex Cloud и токен для доступа к сервису, чтобы зарегистрировать домен; cоздать ВМ в Yandex Cloud или Github Pages, разместить фронтенд-часть приложения Stellar Burgers, добавить ссылку на деплой в README проекта)
+- [x] Деплой приложения (получить грант на Yandex Cloud и токен для доступа к сервису, чтобы зарегистрировать домен; cоздать ВМ в Yandex Cloud или Github Pages, разместить фронтенд-часть приложения Stellar Burgers, добавить ссылку на деплой в README проекта)
 
 ### Маршрутизация:
 
-- `BrowserRouter` + `Routes` / `Route` / `Navigate`, `basename` из `import.meta.env.BASE_URL`.
+- `HashRouter` + `Routes` / `Route` / `Navigate`. На GH Pages адрес вида `https://kirillchistov.github.io/react-burger-ts/#/profile`. Vite `base: '/react-burger-ts/'` задаёт пути к JS/CSS.
 - Главная (`/`) собирает бургер; клик по ингредиенту открывает `/ingredients/:id` модалкой поверх главной (`location.state.background`) или отдельной страницей при прямом заходе.
 - Гостевые страницы: `/login`, `/register`, `/forgot-password`, `/reset-password`. Профиль: `/profile` и `/profile/orders` через `Outlet`. Лента `/feed` получает заказы по `wss://.../orders/all`, пока страница открыта.
 - Клик по заказу открывает `/feed/:id` или `/profile/orders/:id` модалкой поверх списка. В адресе — `_id` заказа: текущий API отдаёт заказ по нему, а не по номеру. Номер показывается в карточке как `#034535`.

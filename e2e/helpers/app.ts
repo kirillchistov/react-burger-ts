@@ -63,7 +63,16 @@ export const seedAuth = async (page: Page): Promise<void> => {
   });
 };
 
+export const hashPath = (pathname: string): string =>
+  pathname === '/' ? '/#/' : `/#${pathname}`;
+
+export const homeUrlPattern = /\/(?:#\/?)?$/;
+
+export const gotoRoute = async (page: Page, pathname: string): Promise<void> => {
+  await page.goto(hashPath(pathname));
+};
+
 export const openConstructor = async (page: Page): Promise<void> => {
-  await page.goto('/');
+  await gotoRoute(page, '/');
   await page.getByTestId(`ingredient-${bun._id}`).waitFor();
 };

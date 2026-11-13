@@ -1,4 +1,5 @@
 import { profileDoneOrder, profileOrdersMessage } from '../fixtures/orders';
+import { gotoRoute } from './app';
 
 import type { Page } from '@playwright/test';
 
@@ -53,6 +54,6 @@ export const mockRefreshToken = async (page: Page): Promise<void> => {
 };
 
 export const openProfileOrders = async (page: Page): Promise<void> => {
-  await page.goto('/profile/orders');
+  await gotoRoute(page, '/profile/orders');
   await page.getByTestId(`order-${profileDoneOrder._id}`).waitFor();
 };

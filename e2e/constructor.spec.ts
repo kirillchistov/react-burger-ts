@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { bun, main, ORDER_NUMBER, sauce } from './fixtures/ingredients';
-import { mockBurgerApi, openConstructor, seedAuth } from './helpers/app';
+import { homeUrlPattern, mockBurgerApi, openConstructor, seedAuth } from './helpers/app';
 import { dragHtml5 } from './helpers/dnd';
 
 test.describe('Конструктор', (): void => {
@@ -63,7 +63,7 @@ test.describe('Конструктор', (): void => {
 
     await modal.getByRole('button', { name: 'Закрыть' }).click();
     await expect(modal).toHaveCount(0);
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL(homeUrlPattern);
     await expect(page.getByText('Соберите бургер')).toBeVisible();
   });
 

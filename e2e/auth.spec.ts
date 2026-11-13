@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { mockUser } from './fixtures/ingredients';
-import { mockBurgerApi } from './helpers/app';
+import { gotoRoute, homeUrlPattern, mockBurgerApi } from './helpers/app';
 import {
   AUTH_ACCESS_TOKEN,
   AUTH_PASSWORD,
@@ -20,7 +20,7 @@ test.describe('Авторизация', (): void => {
   test('логин отправляет почту и пароль и пускает на конструктор', async ({
     page,
   }): Promise<void> => {
-    await page.goto('/login');
+    await gotoRoute(page, '/login');
     await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
 
     await fillByName(page, 'email', mockUser.email);
@@ -39,7 +39,7 @@ test.describe('Авторизация', (): void => {
       password: AUTH_PASSWORD,
     });
 
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL(homeUrlPattern);
     await expect(page.getByText('Соберите бургер')).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem('accessToken'))).toBe(
       AUTH_ACCESS_TOKEN
@@ -50,7 +50,7 @@ test.describe('Авторизация', (): void => {
   });
 
   test('регистрация отправляет имя, почту и пароль', async ({ page }): Promise<void> => {
-    await page.goto('/register');
+    await gotoRoute(page, '/register');
     await expect(page.getByRole('heading', { name: 'Регистрация' })).toBeVisible();
 
     await fillByName(page, 'name', mockUser.name);
@@ -71,14 +71,14 @@ test.describe('Авторизация', (): void => {
       password: AUTH_PASSWORD,
     });
 
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL(homeUrlPattern);
     await expect(page.getByText('Соберите бургер')).toBeVisible();
   });
 
   test('восстановление пароля ставит флаг, открывает сброс и после успеха ведёт на логин', async ({
     page,
   }): Promise<void> => {
-    await page.goto('/forgot-password');
+    await gotoRoute(page, '/forgot-password');
     await expect(
       page.getByRole('heading', { name: 'Восстановление пароля' })
     ).toBeVisible();
