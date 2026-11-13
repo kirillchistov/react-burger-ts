@@ -97,7 +97,7 @@ export const Home = (): React.JSX.Element => {
       {isOrderModalOpen && (
         <Modal onClose={handleCloseOrderModal}>
           {orderIsLoading && (
-            <div className={styles.status}>
+            <div className={styles.status} data-testid="order-preloader">
               <Preloader />
             </div>
           )}

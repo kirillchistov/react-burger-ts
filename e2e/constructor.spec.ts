@@ -173,4 +173,74 @@ test.describe('Конструктор', (): void => {
     await expect(fillings.nth(0)).toContainText(main.name);
     await expect(fillings.nth(1)).toContainText(sauce.name);
   });
+
+  test('пока заказ создаётся, в модалке виден прелоадер', async ({
+    page,
+  }): Promise<void> => {
+    await seedAuth(page);
+    let release: () => void = (): void => undefined;
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+
+    await page.route('**/api/orders', async (route): Promise<void> => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+
+      await hold;
+      await route.fulfill({
+        json: {
+          name: 'Краторный spicy бургер',
+          order: { number: ORDER_NUMBER },
+          success: true,
+        },
+      });
+    });
+
+    await openConstructor(page);
+    const constructor = page.getByTestId('burger-constructor');
+    await dragHtml5(page.getByTestId(`ingredient-${bun._id}`), constructor);
+    await page.getByRole('button', { name: 'Оформить заказ' }).click();
+
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+    await expect(page.getByTestId('order-preloader')).toBeVisible();
+    await expect(modal.getByText('идентификатор заказа')).toHaveCount(0);
+
+    release();
+
+    await expect(modal.getByText(String(ORDER_NUMBER))).toBeVisible();
+    await expect(page.getByTestId('order-preloader')).toHaveCount(0);
+  });
+
+  test('ошибка оформления заказа показывается в модалке и не чистит конструктор', async ({
+    page,
+  }): Promise<void> => {
+    await seedAuth(page);
+    await page.route('**/api/orders', async (route): Promise<void> => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+
+      await route.fulfill({
+        json: { message: 'кухня закрыта', success: false },
+        status: 500,
+      });
+    });
+
+    await openConstructor(page);
+    const constructor = page.getByTestId('burger-constructor');
+    await dragHtml5(page.getByTestId(`ingredient-${bun._id}`), constructor);
+    await dragHtml5(page.getByTestId(`ingredient-${sauce._id}`), constructor);
+    await page.getByRole('button', { name: 'Оформить заказ' }).click();
+
+    const modal = page.getByRole('dialog');
+    await expect(modal.getByText('кухня закрыта')).toBeVisible();
+    await expect(modal.getByText('идентификатор заказа')).toHaveCount(0);
+    await expect(constructor.getByText(`${bun.name} (верх)`)).toBeVisible();
+    await expect(constructor.getByText(sauce.name)).toBeVisible();
+  });
 });
