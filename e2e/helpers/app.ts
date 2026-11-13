@@ -10,14 +10,34 @@ export const mockBurgerApi = async (page: Page): Promise<void> => {
   });
 
   await page.route('**/api/auth/user', async (route): Promise<void> => {
-    if (route.request().method() !== 'GET') {
-      await route.continue();
+    const method = route.request().method();
+
+    if (method === 'GET') {
+      await route.fulfill({
+        json: { success: true, user: mockUser },
+      });
       return;
     }
 
-    await route.fulfill({
-      json: { success: true, user: mockUser },
-    });
+    if (method === 'PATCH') {
+      const body = route.request().postDataJSON() as {
+        email?: string;
+        name?: string;
+      };
+
+      await route.fulfill({
+        json: {
+          success: true,
+          user: {
+            email: body.email ?? mockUser.email,
+            name: body.name ?? mockUser.name,
+          },
+        },
+      });
+      return;
+    }
+
+    await route.continue();
   });
 
   await page.route('**/api/orders', async (route): Promise<void> => {
