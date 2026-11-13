@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { bun, ORDER_NUMBER, sauce } from './fixtures/ingredients';
+import { bun, main, ORDER_NUMBER, sauce } from './fixtures/ingredients';
 import { mockBurgerApi, openConstructor, seedAuth } from './helpers/app';
 import { dragHtml5 } from './helpers/dnd';
 
@@ -97,5 +97,80 @@ test.describe('Конструктор', (): void => {
 
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
+  });
+
+  test('без булки кнопка заказа неактивна', async ({ page }): Promise<void> => {
+    await openConstructor(page);
+
+    const orderButton = page.getByRole('button', { name: 'Оформить заказ' });
+    await expect(orderButton).toBeDisabled();
+
+    await dragHtml5(
+      page.getByTestId(`ingredient-${sauce._id}`),
+      page.getByTestId('burger-constructor')
+    );
+    await expect(orderButton).toBeDisabled();
+
+    await dragHtml5(
+      page.getByTestId(`ingredient-${bun._id}`),
+      page.getByTestId('burger-constructor')
+    );
+    await expect(orderButton).toBeEnabled();
+  });
+
+  test('счётчик на карточке растёт, крестик убирает начинку', async ({
+    page,
+  }): Promise<void> => {
+    await openConstructor(page);
+    const constructor = page.getByTestId('burger-constructor');
+    const sauceCard = page.getByTestId(`ingredient-${sauce._id}`);
+    const bunCard = page.getByTestId(`ingredient-${bun._id}`);
+
+    await expect(sauceCard.locator('.counter__num')).toHaveCount(0);
+
+    await dragHtml5(bunCard, constructor);
+    await expect(bunCard.locator('.counter__num')).toHaveText('2');
+
+    await dragHtml5(sauceCard, constructor);
+    await dragHtml5(sauceCard, constructor);
+    await expect(sauceCard.locator('.counter__num')).toHaveText('2');
+    await expect(constructor.getByText(sauce.name)).toHaveCount(2);
+
+    await page
+      .getByTestId(`constructor-filling-${sauce._id}`)
+      .first()
+      .locator('.constructor-element__action')
+      .click();
+
+    await expect(constructor.getByText(sauce.name)).toHaveCount(1);
+    await expect(sauceCard.locator('.counter__num')).toHaveText('1');
+
+    await page
+      .getByTestId(`constructor-filling-${sauce._id}`)
+      .locator('.constructor-element__action')
+      .click();
+
+    await expect(constructor.getByText('Выберите начинку')).toBeVisible();
+    await expect(sauceCard.locator('.counter__num')).toHaveCount(0);
+  });
+
+  test('меняет порядок начинок перетаскиванием', async ({ page }): Promise<void> => {
+    await openConstructor(page);
+    const constructor = page.getByTestId('burger-constructor');
+
+    await dragHtml5(page.getByTestId(`ingredient-${sauce._id}`), constructor);
+    await dragHtml5(page.getByTestId(`ingredient-${main._id}`), constructor);
+
+    const fillings = constructor.locator('ul li');
+    await expect(fillings.nth(0)).toContainText(sauce.name);
+    await expect(fillings.nth(1)).toContainText(main.name);
+
+    await dragHtml5(
+      page.getByTestId(`constructor-filling-${main._id}`),
+      page.getByTestId(`constructor-filling-${sauce._id}`)
+    );
+
+    await expect(fillings.nth(0)).toContainText(main.name);
+    await expect(fillings.nth(1)).toContainText(sauce.name);
   });
 });
