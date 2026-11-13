@@ -20,6 +20,8 @@ npm run dev
 ## Деплой
 
 Сайт на GitHub Pages: https://kirillchistov.github.io/react-burger-ts/
+Сайт на Yandex Cloud: https://growcery.ru/ (ВМ 153.51.163.30 / compute-vm-yc-middlereact-kirchistov)
+
 
 ```bash
 npm run deploy
@@ -28,6 +30,18 @@ npm run deploy
 `predeploy` сначала делает `vite build`. Затем `gh-pages -d dist` публикует сборку в ветку `gh-pages`. В Settings → Pages: Source «Deploy from a branch», ветка `gh-pages`, папка `/ (root)`. Исходники остаются в основной ветке; после правок в коде — коммит туда, затем снова `npm run deploy`.
 
 Скрипт собирает `dist` с `base: '/react-burger-ts/'` и публикует папку в ветку `gh-pages`. Клиентские маршруты идут через `HashRouter` (`#/profile`), поэтому GitHub Pages всегда отдаёт `index.html` и не отвечает 404 на вложенный путь.
+
+### Nginx + Let's Encrypt (ВМ)
+
+Прод: [https://growcery.ru/](https://growcery.ru/). Nginx на ВМ, сертификат Let's Encrypt для `growcery.ru` и `www.growcery.ru` (до 2027-02-11, автообновление `certbot.timer`). HTTP редиректит на HTTPS.
+
+Конфиг SPA: [`deploy/nginx/react-burger.conf`](deploy/nginx/react-burger.conf) — `try_files $uri $uri/ /index.html`.
+
+Сборка и выкладка статики с Mac (корень сайта, не `/react-burger-ts/`):
+
+```bash
+./deploy/publish.sh
+```
 
 ## Спринт 1:
 
