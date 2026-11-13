@@ -64,7 +64,7 @@ export const BurgerConstructor = ({
 
   return (
     <section className={styles.burgerConstructor}>
-      <div className={styles.stack} ref={setDropRef}>
+      <div className={styles.stack} data-testid="burger-constructor" ref={setDropRef}>
         {bun ? (
           <div className={styles.bun}>
             <ConstructorElement
