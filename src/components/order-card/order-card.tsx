@@ -40,7 +40,12 @@ export const OrderCard = ({
 
   return (
     <li>
-      <Link className={styles.card} state={state} to={to}>
+      <Link
+        className={styles.card}
+        data-testid={`order-${order._id}`}
+        state={state}
+        to={to}
+      >
         <div className={styles.header}>
           <span className="text text_type_digits-default">
             {formatOrderNumber(order.number)}
