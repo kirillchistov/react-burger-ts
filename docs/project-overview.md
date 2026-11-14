@@ -3,13 +3,6 @@
 Stellar Burgers — клиентское React-приложение для сборки бургера и оформления заказа.
 Учебный проект курса «React-разработчик». Реализованы спринты 1–6. Собирается как Vite SPA.
 
-> Схема: [`project-overview.svg`](./project-overview.svg)  
-> Ретро по задачам: [`project-retro.md`](./project-retro.md)  
-> Тесты: [`project-testing.md`](./project-testing.md)  
-> Архитектура: [`project-architecture.md`](./project-architecture.md)
-
-Брифы и чек-листы: [1](./checklist-1.md), [2](./checklist-2.md) / [sprint2](./sprint2.md), [3](./checklist-3.md) / [sprint3](./sprint3.md), [4](./checklist-4.md), [5](./checklist-5.md) / [overview-s5](./project-overview-s5.md).
-
 ## Что делает приложение
 
 - Загружает ингредиенты из Norma API (`GET /ingredients`).
@@ -187,3 +180,10 @@ flowchart TD
 - [x] Vitest: все слайсы, middleware, утилиты, хуки, `ProtectedRoute`
 - [x] Playwright: конструктор (DnD, заказ, модалки) и соседние пути
 - [x] Деплой: GitHub Pages и ВМ Яндекс.Облака, Nginx, сертификат Let's Encrypt
+
+### Дополнительная документация:
+> Схема с анимацией: [project-overview.svg](./project-overview.svg)
+> Архитектура: [project-architecture.md](./project-architecture.md)
+> Покрытие тестами: [project-testing.md](./project-testing.md)
+> Ретро: [project-retro.md](./project-retro.md) 
+> Бриф и чек-листы: [1](./checklist-1.md), [2](./checklist-2.md) [3](./checklist-3.md), [4](./checklist-4.md), [5](./checklist-5.md).

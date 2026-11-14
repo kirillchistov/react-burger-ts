@@ -9,6 +9,7 @@
     "commit": "cz",
     "check": "stylelint && eslint src/",
     "e2e": "npx playwright test",
+    "e2e:install": "npx playwright install chromium",
     "e2e:ui": "npx playwright test --ui",
     "dev": "vite",
     "deploy": "gh-pages -d dist",

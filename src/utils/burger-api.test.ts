@@ -56,8 +56,8 @@ describe('burger-api', (): void => {
   });
 
   afterEach((): void => {
-    vi.unstubAllGlobals();
     localStorage.clear();
+    vi.unstubAllGlobals();
   });
 
   describe('checkResponse', (): void => {

@@ -1,6 +1,6 @@
 # Stellar Burgers
 
-Клиентское React-приложение для сборки космических бургеров. Учебный проект курса «React-разработчик», спринт 1: каталог ингредиентов, конструктор, загрузка данных из API и модальные окна.
+Клиентское React-приложение для заказа космических бургеров. Учебный проект курса «Middle Front-end + React».
 
 ## Стек
 
@@ -37,13 +37,59 @@ npm run deploy
 
 Конфиг SPA: [`deploy/nginx/react-burger.conf`](deploy/nginx/react-burger.conf) — `try_files $uri $uri/ /index.html`.
 
-Сборка и выкладка статики с Mac (корень сайта):
+Сборка и выкладка статики из корня сайта (для Mac):
 
 ```bash
 ./deploy/publish.sh
 ```
 
-## Спринт 1:
+### Маршрутизация:
+
+- `HashRouter` + `Routes` / `Route` / `Navigate`. На GH Pages адрес вида `https://kirillchistov.github.io/react-burger-ts/#/profile`. Vite `base: '/react-burger-ts/'` задаёт пути к JS/CSS.
+- Главная (`/`) собирает бургер; клик по ингредиенту открывает `/ingredients/:id` модалкой поверх главной (`location.state.background`) или отдельной страницей при прямом заходе.
+- Гостевые страницы: `/login`, `/register`, `/forgot-password`, `/reset-password`. Профиль: `/profile` и `/profile/orders` через `Outlet`. Лента `/feed` получает заказы по `wss://.../orders/all`, пока страница открыта.
+- Клик по заказу открывает `/feed/:id` или `/profile/orders/:id` модалкой поверх списка. В адресе — `_id` заказа: текущий API отдаёт заказ по нему, а не по номеру. Номер показывается в карточке как `#034535`.
+- Неизвестные пути: страница 404 (заглушка).
+
+### Авторизация:
+
+- Токены `accessToken` и `refreshToken` хранятся в `localStorage`.
+- Запросы с авторизацией идут через `fetchWithRefresh`: при `jwt expired` обновляется токен и повторяется исходный запрос.
+- Заказ доступен только авторизованным пользователям.
+- `ProtectedRoute` закрывает профиль для гостей и гостевые формы для авторизованных.
+- Сброс пароля доступен только после успешного запроса с `/forgot-password`.
+
+## Проверки перед коммитом
+
+При создании коммита запускаются `stylelint`, `eslint` и `prettier`. Если линтер найдёт ошибки, коммит не создастся: исправьте замечания, затем снова `git add` и коммит.
+
+Перед коммитом:
+
+```bash
+npm run lint
+```
+
+Отдельно:
+
+- `npm run eslint` — ESLint с автоисправлениями
+- `npm run stylelint` — Stylelint с автоисправлениями
+- `npm run prettier` — форматирование
+
+Для коммита по [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) лучше использовать `npm run commit`.
+
+## Алиасы импорта
+
+```
+@          → src
+@components → src/components
+@pages      → src/pages
+@services   → src/services
+@utils      → src/utils
+@hooks      → src/hooks
+```
+
+## [Проект с задачами спринтов](https://github.com/users/kirillchistov/projects/12)
+## [Спринт 1]():
 
 - [x] Список ингредиентов с сервера, прелоадер и обработка ошибок
 - [x] Конструктор с демо-составом, стоимостью и кастомным скроллом
@@ -105,48 +151,6 @@ npm run deploy
 - [x] Покрыть тестами бизнес-логику приложения (все редьюсеры / слайсы, начальное состояние хранилища и все обработчики). Использовать Vitest.
 - [x] Настроить интеграционное тестирование с Playwright (полноценный тест всего пути пользователя для функциональности страницы «Конструктор»: перетаскивание ингредиента, создание заказа, работу модальных окон на странице «Конструктор»).
 - [x] Деплой приложения (получить грант на Yandex Cloud и токен для доступа к сервису, чтобы зарегистрировать [домен](https://growcery.ru/); [cоздать ВМ в Yandex Cloud](https://console.yandex.cloud/folders/b1ghuskffgfsavvpcuuj/compute/instances) или [Github Pages](https://kirillchistov.github.io/react-burger-ts/), разместить фронтенд-часть приложения Stellar Burgers, добавить ссылку на деплой в README проекта)
-
-### Маршрутизация:
-
-- `HashRouter` + `Routes` / `Route` / `Navigate`. На GH Pages адрес вида `https://kirillchistov.github.io/react-burger-ts/#/profile`. Vite `base: '/react-burger-ts/'` задаёт пути к JS/CSS.
-- Главная (`/`) собирает бургер; клик по ингредиенту открывает `/ingredients/:id` модалкой поверх главной (`location.state.background`) или отдельной страницей при прямом заходе.
-- Гостевые страницы: `/login`, `/register`, `/forgot-password`, `/reset-password`. Профиль: `/profile` и `/profile/orders` через `Outlet`. Лента `/feed` получает заказы по `wss://.../orders/all`, пока страница открыта.
-- Клик по заказу открывает `/feed/:id` или `/profile/orders/:id` модалкой поверх списка. В адресе — `_id` заказа: текущий API отдаёт заказ по нему, а не по номеру. Номер показывается в карточке как `#034535`.
-- Неизвестные пути: страница 404 (заглушка).
-
-### Авторизация:
-
-- Токены `accessToken` и `refreshToken` хранятся в `localStorage`.
-- Запросы с авторизацией идут через `fetchWithRefresh`: при `jwt expired` обновляется токен и повторяется исходный запрос.
-- Заказ доступен только авторизованным пользователям.
-- `ProtectedRoute` закрывает профиль для гостей и гостевые формы для авторизованных.
-- Сброс пароля доступен только после успешного запроса с `/forgot-password`.
-
-## Проверки перед коммитом
-
-При создании коммита запускаются `stylelint`, `eslint` и `prettier`. Если линтер найдёт ошибки, коммит не создастся: исправьте замечания, затем снова `git add` и коммит.
-
-Перед коммитом:
-
-```bash
-npm run lint
-```
-
-Отдельно:
-
-- `npm run eslint` — ESLint с автоисправлениями
-- `npm run stylelint` — Stylelint с автоисправлениями
-- `npm run prettier` — форматирование
-
-Для коммита по [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) лучше использовать `npm run commit`.
-
-## Алиасы импорта
-
-```
-@          → src
-@components → src/components
-@pages      → src/pages
-@services   → src/services
-@utils      → src/utils
-@hooks      → src/hooks
-```
+- Доработки по мотивам ревью:
+- [ ] Проверить работу юнит-тестов - [у ревьюера не проходят из-за localStorage](https://yadi.sk/i/iC_uKqBuNN0Qdw) 
+- [ ] Реализовать модели объектов страницы [POM](https://playwright.help/docs/pom), чтобы вынести повторяющуюся логику в отдельный класс и сделать код еще чище.
