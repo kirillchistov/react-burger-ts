@@ -1,11 +1,9 @@
-import {
-  CurrencyIcon,
-  FormattedDate,
-} from '@krgaa/react-developer-burger-ui-components';
+import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 
 import { useAppSelector } from '@services/hooks';
 import { selectIngredients } from '@services/ingredients/ingredients-slice';
 import {
+  formatOrderDate,
   formatOrderNumber,
   getOrderIngredients,
   getOrderPrice,
@@ -67,10 +65,9 @@ export const OrderInfo = ({ order, variant }: TOrderInfoProps): React.JSX.Elemen
       </ul>
       <div className={styles.footer}>
         {hasDate ? (
-          <FormattedDate
-            className="text text_type_main-default text_color_inactive"
-            date={createdAt}
-          />
+          <span className="text text_type_main-default text_color_inactive">
+            {formatOrderDate(createdAt)}
+          </span>
         ) : (
           <span />
         )}
