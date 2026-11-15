@@ -54,6 +54,7 @@ export const IngredientItem = ({
     <li className={styles.card}>
       <div
         className={styles.content}
+        data-testid={`ingredient-${ingredient._id}`}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         ref={setDragRef}

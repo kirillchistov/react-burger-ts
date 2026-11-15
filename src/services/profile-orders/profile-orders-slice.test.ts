@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  profileOrdersClosed,
   profileOrdersConnect,
+  profileOrdersDisconnect,
   profileOrdersFailed,
   profileOrdersSlice,
   profileOrdersUpdated,
@@ -9,7 +11,7 @@ import {
 
 import type { TOrder } from '@utils/types';
 
-const { reducer } = profileOrdersSlice;
+const { getInitialState, reducer } = profileOrdersSlice;
 
 const order: TOrder = {
   _id: 'order-1',
@@ -22,6 +24,14 @@ const order: TOrder = {
 };
 
 describe('profileOrdersSlice', () => {
+  it('начинает с пустой истории и статусом idle', () => {
+    expect(getInitialState()).toEqual({
+      error: null,
+      orders: [],
+      status: 'idle',
+    });
+  });
+
   it('заменяет историю целиком последним сообщением сокета', () => {
     const previous = reducer(
       undefined,
@@ -54,5 +64,21 @@ describe('profileOrdersSlice', () => {
     expect(failed.status).toBe('closed');
     expect(reducer(failed, profileOrdersConnect()).error).toBeNull();
     expect(reducer(failed, profileOrdersConnect()).orders).toEqual([order]);
+  });
+
+  it('закрывает соединение и оставляет заказы на экране', () => {
+    const live = reducer(
+      undefined,
+      profileOrdersUpdated({ orders: [order], total: 1, totalToday: 1 })
+    );
+
+    expect(reducer(live, profileOrdersDisconnect())).toMatchObject({
+      orders: [order],
+      status: 'closed',
+    });
+    expect(reducer(live, profileOrdersClosed())).toMatchObject({
+      orders: [order],
+      status: 'closed',
+    });
   });
 });

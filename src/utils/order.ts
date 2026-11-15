@@ -14,6 +14,48 @@ export const PREVIEW_INGREDIENT_LIMIT = 6;
 export const formatOrderNumber = (number: number): string =>
   `#${String(number).padStart(6, '0')}`;
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const startOfLocalDayUtc = (date: Date): number =>
+  Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+
+const formatOrderTime = (date: Date): string =>
+  `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+const formatDaysAgo = (days: number): string => {
+  const tens = days % 100;
+  const ones = days % 10;
+  const unit =
+    tens >= 11 && tens <= 14
+      ? 'дней'
+      : ones === 1
+        ? 'день'
+        : ones >= 2 && ones <= 4
+          ? 'дня'
+          : 'дней';
+
+  return `${days} ${unit} назад`;
+};
+
+// FormattedDate из UI-kit считает сутки как 24 часа от now, а не календарный день:
+// вчера 19:46 при «сейчас» 15:33 даёт 0 суток → «Сегодня, 19:46».
+export const formatOrderDate = (date: Date): string => {
+  const dayDiff = Math.round(
+    (startOfLocalDayUtc(new Date()) - startOfLocalDayUtc(date)) / MS_PER_DAY
+  );
+  const time = formatOrderTime(date);
+
+  if (dayDiff <= 0) {
+    return `Сегодня, ${time}`;
+  }
+
+  if (dayDiff === 1) {
+    return `Вчера, ${time}`;
+  }
+
+  return `${formatDaysAgo(dayDiff)}, ${time}`;
+};
+
 export const isOrderStatus = (value: unknown): value is TOrderStatus =>
   value === 'created' || value === 'pending' || value === 'done';
 

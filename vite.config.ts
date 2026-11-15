@@ -1,6 +1,3 @@
-import { copyFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
 import react from '@vitejs/plugin-react';
 import { checker } from 'vite-plugin-checker';
 import readableClassnames from 'vite-plugin-readable-classnames';
@@ -23,24 +20,12 @@ export default defineConfig(({ mode }) => ({
       esmExport: true,
     }),
     tsconfigPaths(),
-    {
-      closeBundle: (): void => {
-        if (mode !== 'production') {
-          return;
-        }
-
-        copyFileSync(
-          resolve(__dirname, 'dist/index.html'),
-          resolve(__dirname, 'dist/404.html')
-        );
-      },
-      name: 'copy-index-to-404',
-    },
   ],
   base: mode === 'production' ? githubPagesBase : '/',
   test: {
     globals: true,
     environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ['./vitest-setup.ts'],
   },
   server: {

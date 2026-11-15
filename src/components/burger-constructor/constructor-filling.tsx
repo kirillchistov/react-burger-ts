@@ -69,6 +69,7 @@ export const ConstructorFilling = ({
   return (
     <li
       className={styles.fillingItem}
+      data-testid={`constructor-filling-${ingredient._id}`}
       ref={setItemRef}
       style={{ opacity: isDragging ? 0.4 : 1 }}
     >

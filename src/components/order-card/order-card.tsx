@@ -1,12 +1,10 @@
-import {
-  CurrencyIcon,
-  FormattedDate,
-} from '@krgaa/react-developer-burger-ui-components';
+import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useAppSelector } from '@services/hooks';
 import { selectIngredients } from '@services/ingredients/ingredients-slice';
 import {
+  formatOrderDate,
   formatOrderNumber,
   getOrderIngredients,
   getOrderPrice,
@@ -40,16 +38,20 @@ export const OrderCard = ({
 
   return (
     <li>
-      <Link className={styles.card} state={state} to={to}>
+      <Link
+        className={styles.card}
+        data-testid={`order-${order._id}`}
+        state={state}
+        to={to}
+      >
         <div className={styles.header}>
           <span className="text text_type_digits-default">
             {formatOrderNumber(order.number)}
           </span>
           {hasDate && (
-            <FormattedDate
-              className="text text_type_main-default text_color_inactive"
-              date={createdAt}
-            />
+            <span className="text text_type_main-default text_color_inactive">
+              {formatOrderDate(createdAt)}
+            </span>
           )}
         </div>
         <h2 className={`${styles.name} text text_type_main-medium`}>{order.name}</h2>

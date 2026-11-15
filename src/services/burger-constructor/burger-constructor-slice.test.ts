@@ -1,4 +1,3 @@
-// S4.4 Тесты для бургер-конструктора
 import { describe, expect, it } from 'vitest';
 
 import { store } from '@services/store';
@@ -54,7 +53,7 @@ describe('burgerConstructorSlice', (): void => {
     });
   });
 
-  it('кладёт булку отдельно и заменяет предыдущую', (): void => {
+  it('кладёт булку отдельно, заменяет предыдущую', (): void => {
     const firstBun = createIngredient('bun-1', 'bun', 100);
     const nextBun = createIngredient('bun-2', 'bun', 200);
 
@@ -67,7 +66,7 @@ describe('burgerConstructorSlice', (): void => {
     expect(withNextBun.bun).not.toBe(withFirstBun.bun);
   });
 
-  it('добавляет начинку со своим uuid и удаляет её по uuid', (): void => {
+  it('добавляет начинку со своим uuid, удаляет её по uuid', (): void => {
     const sauce = createIngredient('sauce-1', 'sauce', 50);
     const main = createIngredient('main-1', 'main', 80);
     const withSauce = reducer(getInitialState(), addIngredient(sauce));
