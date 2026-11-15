@@ -1,4 +1,4 @@
-import { bun, ingredients, mockUser, ORDER_NUMBER } from '../fixtures/ingredients';
+import { ingredients, mockUser, ORDER_NUMBER } from '../fixtures/ingredients';
 
 import type { Page } from '@playwright/test';
 
@@ -70,9 +70,4 @@ export const homeUrlPattern = /\/(?:#\/?)?$/;
 
 export const gotoRoute = async (page: Page, pathname: string): Promise<void> => {
   await page.goto(hashPath(pathname));
-};
-
-export const openConstructor = async (page: Page): Promise<void> => {
-  await gotoRoute(page, '/');
-  await page.getByTestId(`ingredient-${bun._id}`).waitFor();
 };

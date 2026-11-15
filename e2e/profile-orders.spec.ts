@@ -1,20 +1,18 @@
-import { expect, test } from '@playwright/test';
-
 import {
   profileCreatedOrder,
   profileDoneOrder,
   profileOrdersMessage,
   profilePendingOrder,
 } from './fixtures/orders';
-import { gotoRoute, mockBurgerApi, seedAuth } from './helpers/app';
+import { mockBurgerApi, seedAuth } from './helpers/app';
 import {
   FRESH_ACCESS_TOKEN,
   mockProfileOrdersSocket,
   mockRefreshToken,
-  openProfileOrders,
   SEEDED_ACCESS_TOKEN,
   SEEDED_REFRESH_TOKEN,
 } from './helpers/profile-orders';
+import { expect, test } from './test';
 
 test.describe('История заказов', (): void => {
   test.beforeEach(async ({ page }): Promise<void> => {
@@ -24,6 +22,7 @@ test.describe('История заказов', (): void => {
 
   test('подключается к сокету без Bearer и показывает статусы заказов', async ({
     page,
+    profileOrdersPage,
   }): Promise<void> => {
     const socketUrls: string[] = [];
     await mockProfileOrdersSocket(page, {
@@ -32,7 +31,7 @@ test.describe('История заказов', (): void => {
       },
     });
 
-    await openProfileOrders(page);
+    await profileOrdersPage.goto();
 
     expect(socketUrls.length).toBeGreaterThan(0);
     for (const url of socketUrls) {
@@ -40,9 +39,9 @@ test.describe('История заказов', (): void => {
       expect(url).not.toMatch(/Bearer/i);
     }
 
-    const doneCard = page.getByTestId(`order-${profileDoneOrder._id}`);
-    const pendingCard = page.getByTestId(`order-${profilePendingOrder._id}`);
-    const createdCard = page.getByTestId(`order-${profileCreatedOrder._id}`);
+    const doneCard = profileOrdersPage.orderCard(profileDoneOrder._id);
+    const pendingCard = profileOrdersPage.orderCard(profilePendingOrder._id);
+    const createdCard = profileOrdersPage.orderCard(profileCreatedOrder._id);
 
     await expect(doneCard.getByText('#034536')).toBeVisible();
     await expect(doneCard.getByText('Выполнен')).toBeVisible();
@@ -50,30 +49,28 @@ test.describe('История заказов', (): void => {
     await expect(pendingCard.getByText('Готовится')).toBeVisible();
     await expect(createdCard.getByText('#034400')).toBeVisible();
     await expect(createdCard.getByText('Создан')).toBeVisible();
-    await expect(
-      page.getByText('В этом разделе вы можете просмотреть свою историю заказов')
-    ).toBeVisible();
+    await expect(profileOrdersPage.hint).toBeVisible();
   });
 
   test('клик по заказу открывает модалку поверх истории', async ({
     page,
+    profileOrdersPage,
   }): Promise<void> => {
     await mockProfileOrdersSocket(page);
-    await openProfileOrders(page);
-
-    await page.getByTestId(`order-${profileDoneOrder._id}`).click();
+    await profileOrdersPage.goto();
+    await profileOrdersPage.openOrder(profileDoneOrder._id);
 
     await expect(page).toHaveURL(new RegExp(`/profile/orders/${profileDoneOrder._id}`));
-    const modal = page.getByRole('dialog');
-    await expect(modal).toBeVisible();
-    await expect(modal.getByText('#034536')).toBeVisible();
-    await expect(modal.getByText(profileDoneOrder.name)).toBeVisible();
-    await expect(modal.getByText('Выполнен')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'История заказов' })).toBeVisible();
+    await expect(profileOrdersPage.modal).toBeVisible();
+    await expect(profileOrdersPage.modal.getByText('#034536')).toBeVisible();
+    await expect(profileOrdersPage.modal.getByText(profileDoneOrder.name)).toBeVisible();
+    await expect(profileOrdersPage.modal.getByText('Выполнен')).toBeVisible();
+    await expect(profileOrdersPage.historyLink).toBeVisible();
   });
 
   test('после Invalid or missing token обновляет токен и подключается снова', async ({
     page,
+    profileOrdersPage,
   }): Promise<void> => {
     const socketUrls: string[] = [];
     await mockRefreshToken(page);
@@ -90,17 +87,14 @@ test.describe('История заказов', (): void => {
       },
     });
 
-    const refreshRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' && request.url().includes('/api/auth/token')
-    );
+    const refreshRequest = profileOrdersPage.waitForTokenRefresh();
 
-    await gotoRoute(page, '/profile/orders');
+    await profileOrdersPage.open('/profile/orders');
 
     const request = await refreshRequest;
     expect(request.postDataJSON()).toEqual({ token: SEEDED_REFRESH_TOKEN });
 
-    await page.getByTestId(`order-${profileDoneOrder._id}`).waitFor();
+    await profileOrdersPage.orderCard(profileDoneOrder._id).waitFor();
 
     expect(socketUrls.some((url) => url.includes(`token=${SEEDED_ACCESS_TOKEN}`))).toBe(
       true

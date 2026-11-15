@@ -60,11 +60,3 @@ export const mockAuthApi = async (page: Page): Promise<void> => {
     await route.fulfill({ json: { message: 'ok', success: true } });
   });
 };
-
-export const fillByName = async (
-  page: Page,
-  name: string,
-  value: string
-): Promise<void> => {
-  await page.locator(`input[name="${name}"]`).fill(value);
-};

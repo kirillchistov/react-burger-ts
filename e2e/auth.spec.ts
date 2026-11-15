@@ -1,15 +1,13 @@
-import { expect, test } from '@playwright/test';
-
 import { mockUser } from './fixtures/ingredients';
-import { gotoRoute, homeUrlPattern, mockBurgerApi } from './helpers/app';
+import { homeUrlPattern, mockBurgerApi } from './helpers/app';
 import {
   AUTH_ACCESS_TOKEN,
   AUTH_PASSWORD,
   AUTH_REFRESH_TOKEN,
   AUTH_RESET_CODE,
-  fillByName,
   mockAuthApi,
 } from './helpers/auth';
+import { expect, test } from './test';
 
 test.describe('Авторизация', (): void => {
   test.beforeEach(async ({ page }): Promise<void> => {
@@ -18,53 +16,38 @@ test.describe('Авторизация', (): void => {
   });
 
   test('логин отправляет почту и пароль и пускает на конструктор', async ({
+    homePage,
+    loginPage,
     page,
   }): Promise<void> => {
-    await gotoRoute(page, '/login');
-    await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
+    await loginPage.goto();
 
-    await fillByName(page, 'email', mockUser.email);
-    await fillByName(page, 'password', AUTH_PASSWORD);
+    const request = await loginPage.submitLogin(mockUser.email, AUTH_PASSWORD);
 
-    const loginRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' && request.url().includes('/api/auth/login')
-    );
-
-    await page.getByRole('button', { name: 'Войти' }).click();
-
-    const request = await loginRequest;
     expect(request.postDataJSON()).toEqual({
       email: mockUser.email,
       password: AUTH_PASSWORD,
     });
 
     await expect(page).toHaveURL(homeUrlPattern);
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
-    expect(await page.evaluate(() => localStorage.getItem('accessToken'))).toBe(
-      AUTH_ACCESS_TOKEN
-    );
-    expect(await page.evaluate(() => localStorage.getItem('refreshToken'))).toBe(
-      AUTH_REFRESH_TOKEN
-    );
+    await expect(homePage.title).toBeVisible();
+    expect(await loginPage.storageItem('accessToken')).toBe(AUTH_ACCESS_TOKEN);
+    expect(await loginPage.storageItem('refreshToken')).toBe(AUTH_REFRESH_TOKEN);
   });
 
-  test('регистрация отправляет имя, почту и пароль', async ({ page }): Promise<void> => {
-    await gotoRoute(page, '/register');
-    await expect(page.getByRole('heading', { name: 'Регистрация' })).toBeVisible();
+  test('регистрация отправляет имя, почту и пароль', async ({
+    homePage,
+    page,
+    registerPage,
+  }): Promise<void> => {
+    await registerPage.goto();
 
-    await fillByName(page, 'name', mockUser.name);
-    await fillByName(page, 'email', mockUser.email);
-    await fillByName(page, 'password', AUTH_PASSWORD);
-
-    const registerRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' && request.url().includes('/api/auth/register')
+    const request = await registerPage.submitRegister(
+      mockUser.name,
+      mockUser.email,
+      AUTH_PASSWORD
     );
 
-    await page.getByRole('button', { name: 'Зарегистрироваться' }).click();
-
-    const request = await registerRequest;
     expect(request.postDataJSON()).toEqual({
       email: mockUser.email,
       name: mockUser.name,
@@ -72,56 +55,32 @@ test.describe('Авторизация', (): void => {
     });
 
     await expect(page).toHaveURL(homeUrlPattern);
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
+    await expect(homePage.title).toBeVisible();
   });
 
   test('восстановление пароля ставит флаг, открывает сброс и после успеха ведёт на логин', async ({
+    forgotPasswordPage,
+    loginPage,
     page,
+    resetPasswordPage,
   }): Promise<void> => {
-    await gotoRoute(page, '/forgot-password');
-    await expect(
-      page.getByRole('heading', { name: 'Восстановление пароля' })
-    ).toBeVisible();
+    await forgotPasswordPage.goto();
 
-    await fillByName(page, 'email', mockUser.email);
+    const forgot = await forgotPasswordPage.submitEmail(mockUser.email);
 
-    const forgotRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' && request.url().endsWith('/api/password-reset')
-    );
-
-    await page.getByRole('button', { name: 'Восстановить' }).click();
-
-    const forgot = await forgotRequest;
     expect(forgot.postDataJSON()).toEqual({ email: mockUser.email });
-
     await expect(page).toHaveURL(/\/reset-password/);
-    expect(await page.evaluate(() => localStorage.getItem('resetPasswordAllowed'))).toBe(
-      'true'
-    );
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toBeVisible();
+    expect(await forgotPasswordPage.storageItem('resetPasswordAllowed')).toBe('true');
+    await expect(resetPasswordPage.submit).toBeVisible();
 
-    await fillByName(page, 'password', AUTH_PASSWORD);
-    await fillByName(page, 'token', AUTH_RESET_CODE);
+    const reset = await resetPasswordPage.submitReset(AUTH_PASSWORD, AUTH_RESET_CODE);
 
-    const resetRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' &&
-        request.url().includes('/api/password-reset/reset')
-    );
-
-    await page.getByRole('button', { name: 'Сохранить' }).click();
-
-    const reset = await resetRequest;
     expect(reset.postDataJSON()).toEqual({
       password: AUTH_PASSWORD,
       token: AUTH_RESET_CODE,
     });
-
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
-    expect(
-      await page.evaluate(() => localStorage.getItem('resetPasswordAllowed'))
-    ).toBeNull();
+    await expect(loginPage.heading).toBeVisible();
+    expect(await loginPage.storageItem('resetPasswordAllowed')).toBeNull();
   });
 });

@@ -37,6 +37,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "e2e"],
+  "include": ["src", "e2e", "vitest-setup.ts"],
   "exclude": ["**/*.module.css.d.ts", "**/*.module.scss.d.ts"]
 }

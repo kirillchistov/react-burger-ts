@@ -1,53 +1,40 @@
-import { expect, test } from '@playwright/test';
-
 import { mockUser } from './fixtures/ingredients';
-import { gotoRoute, mockBurgerApi, seedAuth } from './helpers/app';
-import { AUTH_PASSWORD, fillByName, mockAuthApi } from './helpers/auth';
+import { mockBurgerApi, seedAuth } from './helpers/app';
+import { AUTH_PASSWORD, mockAuthApi } from './helpers/auth';
+import { expect, test } from './test';
 
 test.describe('Профиль', (): void => {
-  test.beforeEach(async ({ page }): Promise<void> => {
+  test.beforeEach(async ({ page, profilePage }): Promise<void> => {
     await mockBurgerApi(page);
     await mockAuthApi(page);
     await seedAuth(page);
-    await gotoRoute(page, '/profile');
-    await expect(page.locator('input[name="name"]')).toHaveValue(mockUser.name);
+    await profilePage.goto();
   });
 
   test('отмена возвращает поля, сохранение шлёт PATCH без пустого пароля', async ({
-    page,
+    profilePage,
   }): Promise<void> => {
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toHaveCount(0);
+    await expect(profilePage.save).toHaveCount(0);
 
-    await fillByName(page, 'name', 'Кирилл');
-    await expect(page.getByRole('button', { name: 'Отмена' })).toBeVisible();
-    await page.getByRole('button', { name: 'Отмена' }).click();
-    await expect(page.locator('input[name="name"]')).toHaveValue(mockUser.name);
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toHaveCount(0);
+    await profilePage.fillField('name', 'Кирилл');
+    await expect(profilePage.cancel).toBeVisible();
+    await profilePage.cancel.click();
+    await expect(profilePage.field('name')).toHaveValue(mockUser.name);
+    await expect(profilePage.save).toHaveCount(0);
 
-    await fillByName(page, 'name', 'Кирилл');
-    const patchWithoutPassword = page.waitForRequest(
-      (request) =>
-        request.method() === 'PATCH' && request.url().includes('/api/auth/user')
-    );
-    await page.getByRole('button', { name: 'Сохранить' }).click();
+    await profilePage.fillField('name', 'Кирилл');
+    const withoutPassword = await profilePage.saveProfile();
 
-    const withoutPassword = await patchWithoutPassword;
     expect(withoutPassword.postDataJSON()).toEqual({
       email: mockUser.email,
       name: 'Кирилл',
     });
+    await expect(profilePage.field('name')).toHaveValue('Кирилл');
+    await expect(profilePage.save).toHaveCount(0);
 
-    await expect(page.locator('input[name="name"]')).toHaveValue('Кирилл');
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toHaveCount(0);
+    await profilePage.fillField('password', AUTH_PASSWORD);
+    const withPassword = await profilePage.saveProfile();
 
-    await fillByName(page, 'password', AUTH_PASSWORD);
-    const patchWithPassword = page.waitForRequest(
-      (request) =>
-        request.method() === 'PATCH' && request.url().includes('/api/auth/user')
-    );
-    await page.getByRole('button', { name: 'Сохранить' }).click();
-
-    const withPassword = await patchWithPassword;
     expect(withPassword.postDataJSON()).toEqual({
       email: mockUser.email,
       name: 'Кирилл',
@@ -55,19 +42,17 @@ test.describe('Профиль', (): void => {
     });
   });
 
-  test('выход очищает токены и открывает логин', async ({ page }): Promise<void> => {
-    const logoutRequest = page.waitForRequest(
-      (request) =>
-        request.method() === 'POST' && request.url().includes('/api/auth/logout')
-    );
+  test('выход очищает токены и открывает логин', async ({
+    loginPage,
+    page,
+    profilePage,
+  }): Promise<void> => {
+    const request = await profilePage.submitLogout();
 
-    await page.getByRole('button', { name: 'Выход' }).click();
-
-    const request = await logoutRequest;
     expect(request.postDataJSON()).toEqual({ token: 'test-refresh-token' });
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
-    expect(await page.evaluate(() => localStorage.getItem('accessToken'))).toBeNull();
-    expect(await page.evaluate(() => localStorage.getItem('refreshToken'))).toBeNull();
+    await expect(loginPage.heading).toBeVisible();
+    expect(await profilePage.storageItem('accessToken')).toBeNull();
+    expect(await profilePage.storageItem('refreshToken')).toBeNull();
   });
 });

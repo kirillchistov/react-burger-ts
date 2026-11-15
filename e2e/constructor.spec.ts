@@ -1,8 +1,6 @@
-import { expect, test } from '@playwright/test';
-
 import { bun, main, ORDER_NUMBER, sauce } from './fixtures/ingredients';
-import { homeUrlPattern, mockBurgerApi, openConstructor, seedAuth } from './helpers/app';
-import { dragHtml5 } from './helpers/dnd';
+import { homeUrlPattern, mockBurgerApi, seedAuth } from './helpers/app';
+import { expect, test } from './test';
 
 test.describe('Конструктор', (): void => {
   test.beforeEach(async ({ page }): Promise<void> => {
@@ -10,171 +8,137 @@ test.describe('Конструктор', (): void => {
   });
 
   test('собирает бургер перетаскиванием и показывает номер заказа в модалке без логина', async ({
+    homePage,
     page,
   }): Promise<void> => {
     await seedAuth(page);
-    await openConstructor(page);
+    await homePage.goto();
 
-    const constructor = page.getByTestId('burger-constructor');
+    await homePage.addIngredient(bun._id);
+    await homePage.addIngredient(sauce._id);
 
-    await dragHtml5(page.getByTestId(`ingredient-${bun._id}`), constructor);
-    await dragHtml5(page.getByTestId(`ingredient-${sauce._id}`), constructor);
-
-    await expect(constructor.getByText(`${bun.name} (верх)`)).toBeVisible();
-    await expect(constructor.getByText(`${bun.name} (низ)`)).toBeVisible();
-    await expect(constructor.getByText(sauce.name)).toBeVisible();
+    await expect(
+      homePage.constructorPanel.getByText(`${bun.name} (верх)`)
+    ).toBeVisible();
+    await expect(homePage.constructorPanel.getByText(`${bun.name} (низ)`)).toBeVisible();
+    await expect(homePage.constructorPanel.getByText(sauce.name)).toBeVisible();
     await expect(page.getByText('2600')).toBeVisible();
 
-    const orderRequest = page.waitForRequest(
-      (request) => request.url().includes('/api/orders') && request.method() === 'POST'
-    );
+    const request = await homePage.submitOrder();
 
-    await page.getByRole('button', { name: 'Оформить заказ' }).click();
-
-    const request = await orderRequest;
     expect(request.postDataJSON()).toEqual({
       ingredients: [bun._id, sauce._id, bun._id],
     });
     expect(page.url()).not.toContain('/login');
 
-    const modal = page.getByRole('dialog');
-    await expect(modal.getByText(String(ORDER_NUMBER))).toBeVisible();
-    await expect(modal.getByText('идентификатор заказа')).toBeVisible();
-    await expect(modal.getByText('Ваш заказ начали готовить')).toBeVisible();
+    await expect(homePage.modal.getByText(String(ORDER_NUMBER))).toBeVisible();
+    await expect(homePage.modal.getByText('идентификатор заказа')).toBeVisible();
+    await expect(homePage.modal.getByText('Ваш заказ начали готовить')).toBeVisible();
 
-    await modal.getByRole('button', { name: 'Закрыть' }).click();
-    await expect(modal).toHaveCount(0);
-    await expect(page.getByText('Выберите булки').first()).toBeVisible();
-    await expect(page.getByText('Выберите начинку')).toBeVisible();
+    await homePage.closeModal();
+    await expect(homePage.modal).toHaveCount(0);
+    await expect(homePage.emptyBunHint).toBeVisible();
+    await expect(homePage.emptyFillingHint).toBeVisible();
   });
 
   test('открывает модалку ингредиента и закрывает её крестиком', async ({
+    homePage,
     page,
   }): Promise<void> => {
-    await openConstructor(page);
+    await homePage.goto();
+    await homePage.ingredient(bun._id).click();
 
-    await page.getByTestId(`ingredient-${bun._id}`).click();
-
-    const modal = page.getByRole('dialog');
-    await expect(modal.getByText('Детали ингредиента')).toBeVisible();
-    await expect(modal.getByText(bun.name)).toBeVisible();
-    await expect(modal.getByText('Калории, ккал')).toBeVisible();
+    await expect(homePage.modal.getByText('Детали ингредиента')).toBeVisible();
+    await expect(homePage.modal.getByText(bun.name)).toBeVisible();
+    await expect(homePage.modal.getByText('Калории, ккал')).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/ingredients/${bun._id}`));
 
-    await modal.getByRole('button', { name: 'Закрыть' }).click();
-    await expect(modal).toHaveCount(0);
+    await homePage.closeModal();
+    await expect(homePage.modal).toHaveCount(0);
     await expect(page).toHaveURL(homeUrlPattern);
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
+    await expect(homePage.title).toBeVisible();
   });
 
   test('закрывает модалку ингредиента по оверлею и по Escape', async ({
-    page,
+    homePage,
   }): Promise<void> => {
-    await openConstructor(page);
+    await homePage.goto();
 
-    await page.getByTestId(`ingredient-${sauce._id}`).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await homePage.ingredient(sauce._id).click();
+    await expect(homePage.modal).toBeVisible();
+    await homePage.closeModalByOverlay();
+    await expect(homePage.modal).toHaveCount(0);
 
-    await page.getByTestId('modal-overlay').click({ position: { x: 8, y: 8 } });
-    await expect(page.getByRole('dialog')).toHaveCount(0);
-
-    await page.getByTestId(`ingredient-${sauce._id}`).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await homePage.ingredient(sauce._id).click();
+    await expect(homePage.modal).toBeVisible();
+    await homePage.closeModalByEscape();
+    await expect(homePage.modal).toHaveCount(0);
   });
 
   test('гость при оформлении заказа уходит на логин, не оформляя заказ', async ({
+    homePage,
+    loginPage,
     page,
   }): Promise<void> => {
-    await openConstructor(page);
-
-    await dragHtml5(
-      page.getByTestId(`ingredient-${bun._id}`),
-      page.getByTestId('burger-constructor')
-    );
-    await page.getByRole('button', { name: 'Оформить заказ' }).click();
+    await homePage.goto();
+    await homePage.addIngredient(bun._id);
+    await homePage.clickOrder();
 
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
+    await expect(loginPage.heading).toBeVisible();
   });
 
-  test('без булки кнопка заказа неактивна', async ({ page }): Promise<void> => {
-    await openConstructor(page);
+  test('без булки кнопка заказа неактивна', async ({ homePage }): Promise<void> => {
+    await homePage.goto();
+    await expect(homePage.orderButton).toBeDisabled();
 
-    const orderButton = page.getByRole('button', { name: 'Оформить заказ' });
-    await expect(orderButton).toBeDisabled();
+    await homePage.addIngredient(sauce._id);
+    await expect(homePage.orderButton).toBeDisabled();
 
-    await dragHtml5(
-      page.getByTestId(`ingredient-${sauce._id}`),
-      page.getByTestId('burger-constructor')
-    );
-    await expect(orderButton).toBeDisabled();
-
-    await dragHtml5(
-      page.getByTestId(`ingredient-${bun._id}`),
-      page.getByTestId('burger-constructor')
-    );
-    await expect(orderButton).toBeEnabled();
+    await homePage.addIngredient(bun._id);
+    await expect(homePage.orderButton).toBeEnabled();
   });
 
   test('счётчик на карточке растёт, крестик убирает начинку', async ({
-    page,
+    homePage,
   }): Promise<void> => {
-    await openConstructor(page);
-    const constructor = page.getByTestId('burger-constructor');
-    const sauceCard = page.getByTestId(`ingredient-${sauce._id}`);
-    const bunCard = page.getByTestId(`ingredient-${bun._id}`);
+    await homePage.goto();
 
-    await expect(sauceCard.locator('.counter__num')).toHaveCount(0);
+    await expect(homePage.counter(sauce._id)).toHaveCount(0);
 
-    await dragHtml5(bunCard, constructor);
-    await expect(bunCard.locator('.counter__num')).toHaveText('2');
+    await homePage.addIngredient(bun._id);
+    await expect(homePage.counter(bun._id)).toHaveText('2');
 
-    await dragHtml5(sauceCard, constructor);
-    await dragHtml5(sauceCard, constructor);
-    await expect(sauceCard.locator('.counter__num')).toHaveText('2');
-    await expect(constructor.getByText(sauce.name)).toHaveCount(2);
+    await homePage.addIngredient(sauce._id);
+    await homePage.addIngredient(sauce._id);
+    await expect(homePage.counter(sauce._id)).toHaveText('2');
+    await expect(homePage.constructorPanel.getByText(sauce.name)).toHaveCount(2);
 
-    await page
-      .getByTestId(`constructor-filling-${sauce._id}`)
-      .first()
-      .locator('.constructor-element__action')
-      .click();
+    await homePage.removeFirstFilling(sauce._id);
+    await expect(homePage.constructorPanel.getByText(sauce.name)).toHaveCount(1);
+    await expect(homePage.counter(sauce._id)).toHaveText('1');
 
-    await expect(constructor.getByText(sauce.name)).toHaveCount(1);
-    await expect(sauceCard.locator('.counter__num')).toHaveText('1');
-
-    await page
-      .getByTestId(`constructor-filling-${sauce._id}`)
-      .locator('.constructor-element__action')
-      .click();
-
-    await expect(constructor.getByText('Выберите начинку')).toBeVisible();
-    await expect(sauceCard.locator('.counter__num')).toHaveCount(0);
+    await homePage.removeFilling(sauce._id);
+    await expect(homePage.emptyFillingHint).toBeVisible();
+    await expect(homePage.counter(sauce._id)).toHaveCount(0);
   });
 
-  test('меняет порядок начинок перетаскиванием', async ({ page }): Promise<void> => {
-    await openConstructor(page);
-    const constructor = page.getByTestId('burger-constructor');
+  test('меняет порядок начинок перетаскиванием', async ({ homePage }): Promise<void> => {
+    await homePage.goto();
+    await homePage.addIngredient(sauce._id);
+    await homePage.addIngredient(main._id);
 
-    await dragHtml5(page.getByTestId(`ingredient-${sauce._id}`), constructor);
-    await dragHtml5(page.getByTestId(`ingredient-${main._id}`), constructor);
+    await expect(homePage.fillingNames().nth(0)).toContainText(sauce.name);
+    await expect(homePage.fillingNames().nth(1)).toContainText(main.name);
 
-    const fillings = constructor.locator('ul li');
-    await expect(fillings.nth(0)).toContainText(sauce.name);
-    await expect(fillings.nth(1)).toContainText(main.name);
+    await homePage.sortFilling(main._id, sauce._id);
 
-    await dragHtml5(
-      page.getByTestId(`constructor-filling-${main._id}`),
-      page.getByTestId(`constructor-filling-${sauce._id}`)
-    );
-
-    await expect(fillings.nth(0)).toContainText(main.name);
-    await expect(fillings.nth(1)).toContainText(sauce.name);
+    await expect(homePage.fillingNames().nth(0)).toContainText(main.name);
+    await expect(homePage.fillingNames().nth(1)).toContainText(sauce.name);
   });
 
   test('пока заказ создаётся, в модалке виден прелоадер', async ({
+    homePage,
     page,
   }): Promise<void> => {
     await seedAuth(page);
@@ -199,23 +163,22 @@ test.describe('Конструктор', (): void => {
       });
     });
 
-    await openConstructor(page);
-    const constructor = page.getByTestId('burger-constructor');
-    await dragHtml5(page.getByTestId(`ingredient-${bun._id}`), constructor);
-    await page.getByRole('button', { name: 'Оформить заказ' }).click();
+    await homePage.goto();
+    await homePage.addIngredient(bun._id);
+    await homePage.clickOrder();
 
-    const modal = page.getByRole('dialog');
-    await expect(modal).toBeVisible();
-    await expect(page.getByTestId('order-preloader')).toBeVisible();
-    await expect(modal.getByText('идентификатор заказа')).toHaveCount(0);
+    await expect(homePage.modal).toBeVisible();
+    await expect(homePage.orderPreloader).toBeVisible();
+    await expect(homePage.modal.getByText('идентификатор заказа')).toHaveCount(0);
 
     release();
 
-    await expect(modal.getByText(String(ORDER_NUMBER))).toBeVisible();
-    await expect(page.getByTestId('order-preloader')).toHaveCount(0);
+    await expect(homePage.modal.getByText(String(ORDER_NUMBER))).toBeVisible();
+    await expect(homePage.orderPreloader).toHaveCount(0);
   });
 
   test('ошибка оформления заказа показывается в модалке и не чистит конструктор', async ({
+    homePage,
     page,
   }): Promise<void> => {
     await seedAuth(page);
@@ -231,16 +194,16 @@ test.describe('Конструктор', (): void => {
       });
     });
 
-    await openConstructor(page);
-    const constructor = page.getByTestId('burger-constructor');
-    await dragHtml5(page.getByTestId(`ingredient-${bun._id}`), constructor);
-    await dragHtml5(page.getByTestId(`ingredient-${sauce._id}`), constructor);
-    await page.getByRole('button', { name: 'Оформить заказ' }).click();
+    await homePage.goto();
+    await homePage.addIngredient(bun._id);
+    await homePage.addIngredient(sauce._id);
+    await homePage.clickOrder();
 
-    const modal = page.getByRole('dialog');
-    await expect(modal.getByText('кухня закрыта')).toBeVisible();
-    await expect(modal.getByText('идентификатор заказа')).toHaveCount(0);
-    await expect(constructor.getByText(`${bun.name} (верх)`)).toBeVisible();
-    await expect(constructor.getByText(sauce.name)).toBeVisible();
+    await expect(homePage.modal.getByText('кухня закрыта')).toBeVisible();
+    await expect(homePage.modal.getByText('идентификатор заказа')).toHaveCount(0);
+    await expect(
+      homePage.constructorPanel.getByText(`${bun.name} (верх)`)
+    ).toBeVisible();
+    await expect(homePage.constructorPanel.getByText(sauce.name)).toBeVisible();
   });
 });

@@ -1,12 +1,6 @@
-import { expect, test } from '@playwright/test';
-
 import { bun } from './fixtures/ingredients';
-import {
-  gotoRoute,
-  homeUrlPattern,
-  mockBurgerApi,
-  openConstructor,
-} from './helpers/app';
+import { homeUrlPattern, mockBurgerApi } from './helpers/app';
+import { expect, test } from './test';
 
 test.describe('Навигация', (): void => {
   test.beforeEach(async ({ page }): Promise<void> => {
@@ -14,51 +8,57 @@ test.describe('Навигация', (): void => {
   });
 
   test('прямой заход на ингредиент открывает страницу, а не модалку', async ({
-    page,
+    ingredientPage,
   }): Promise<void> => {
-    await gotoRoute(page, `/ingredients/${bun._id}`);
+    await ingredientPage.goto(bun._id);
 
-    await expect(
-      page.getByRole('heading', { name: 'Детали ингредиента' })
-    ).toBeVisible();
-    await expect(page.getByText(bun.name)).toBeVisible();
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(ingredientPage.heading).toBeVisible();
+    await expect(ingredientPage.page.getByText(bun.name)).toBeVisible();
+    await expect(ingredientPage.modal).toHaveCount(0);
   });
 
-  test('из шапки открывается лента заказов', async ({ page }): Promise<void> => {
-    await openConstructor(page);
-
-    await page.getByRole('link', { name: 'Лента заказов' }).click();
+  test('из шапки открывается лента заказов', async ({
+    homePage,
+    page,
+  }): Promise<void> => {
+    await homePage.goto();
+    await homePage.feedLink.click();
     await expect(page).toHaveURL(/\/feed/);
   });
 
-  test('гость с /profile попадает на логин', async ({ page }): Promise<void> => {
-    await gotoRoute(page, '/profile');
+  test('гость с /profile попадает на логин', async ({
+    loginPage,
+    page,
+    profilePage,
+  }): Promise<void> => {
+    await profilePage.open('/profile');
 
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'Вход' })).toBeVisible();
+    await expect(loginPage.heading).toBeVisible();
   });
 
   test('сброс пароля без флага уводит на забыли пароль', async ({
+    forgotPasswordPage,
     page,
+    resetPasswordPage,
   }): Promise<void> => {
-    await gotoRoute(page, '/reset-password');
+    await resetPasswordPage.goto();
 
     await expect(page).toHaveURL(/\/forgot-password/);
-    await expect(
-      page.getByRole('heading', { name: 'Восстановление пароля' })
-    ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Восстановить' })).toBeVisible();
+    await expect(forgotPasswordPage.heading).toBeVisible();
+    await expect(forgotPasswordPage.submit).toBeVisible();
   });
 
-  test('неизвестный путь показывает 404', async ({ page }): Promise<void> => {
-    await gotoRoute(page, '/no-such-page');
+  test('неизвестный путь показывает 404', async ({
+    homePage,
+    notFoundPage,
+    page,
+  }): Promise<void> => {
+    await notFoundPage.goto();
 
-    await expect(page.getByText('404')).toBeVisible();
-    await expect(page.getByText('Страница не найдена')).toBeVisible();
-
-    await page.getByRole('link', { name: 'Вернуться на главную' }).click();
+    await expect(notFoundPage.title).toBeVisible();
+    await notFoundPage.homeLink.click();
     await expect(page).toHaveURL(homeUrlPattern);
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
+    await expect(homePage.title).toBeVisible();
   });
 });

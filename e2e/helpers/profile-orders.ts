@@ -1,5 +1,4 @@
-import { profileDoneOrder, profileOrdersMessage } from '../fixtures/orders';
-import { gotoRoute } from './app';
+import { profileOrdersMessage } from '../fixtures/orders';
 
 import type { Page } from '@playwright/test';
 
@@ -51,9 +50,4 @@ export const mockRefreshToken = async (page: Page): Promise<void> => {
       },
     });
   });
-};
-
-export const openProfileOrders = async (page: Page): Promise<void> => {
-  await gotoRoute(page, '/profile/orders');
-  await page.getByTestId(`order-${profileDoneOrder._id}`).waitFor();
 };

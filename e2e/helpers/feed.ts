@@ -1,5 +1,4 @@
 import { feedMessage, remoteOrder } from '../fixtures/orders';
-import { gotoRoute } from './app';
 
 import type { Page } from '@playwright/test';
 import type { TOrder, TOrdersFeed } from '@utils/types';
@@ -45,9 +44,4 @@ export const mockOrderById = async (
       json: { orders: [order], success: true },
     });
   });
-};
-
-export const openFeed = async (page: Page): Promise<void> => {
-  await gotoRoute(page, '/feed');
-  await page.getByRole('heading', { name: 'Лента заказов' }).waitFor();
 };
