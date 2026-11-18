@@ -1,11 +1,14 @@
-// S3.5 Слайс для регистрации и управления состоянием авторизации
+// S4.3 Слайс для регистрации и управления состоянием авторизации
+// S4.4 Тесты для авторизации
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
+  forgotPassword,
   getUser,
   loginUser,
   logoutUser,
   registerUser,
+  resetPassword,
   updateUser,
 } from './auth-actions';
 
@@ -95,6 +98,28 @@ export const authSlice = createSlice({
       .addCase(updateUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload ?? 'Не удалось сохранить профиль';
+      })
+      .addCase(forgotPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload ?? 'Не удалось отправить письмо';
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload ?? 'Не удалось сохранить новый пароль';
       });
   },
   selectors: {

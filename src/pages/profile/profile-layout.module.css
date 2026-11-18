@@ -21,8 +21,6 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin: 0;
-  padding: 17px 0;
   color: #8585ad;
   text-align: left;
   text-decoration: none;
@@ -38,7 +36,6 @@
 
 .hint {
   max-width: 320px;
-  margin: 80px 0 0;
 }
 
 .content {
@@ -62,13 +59,11 @@
 
   .link {
     width: auto;
-    padding: 8px 0;
   }
 
   .hint {
     flex-basis: 100%;
     max-width: none;
-    margin: 8px 0 0;
   }
 }
 

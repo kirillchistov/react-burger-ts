@@ -113,7 +113,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
         {groupedIngredients.map(({ type, label, items }) => (
           <section key={type} className={styles.group}>
             <h2
-              className={`${styles.title} text text_type_main-medium`}
+              className={`${styles.title} text text_type_main-medium mb-6`}
               ref={(element) => {
                 titleRefs.current[type] = element;
               }}

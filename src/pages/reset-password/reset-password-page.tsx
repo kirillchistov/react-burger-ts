@@ -1,15 +1,20 @@
-// S3.3.2: Страница reset-password с формой сброса пароля
-// S3.6.2: Сброс: запрос -> флаг, успех -> переход на /login, нет -> на /forgot-password
+// S4.6 Страница reset-password с формой сброса пароля
 import {
   Button,
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { resetPassword } from '@services/auth/auth-actions';
-import { useAppDispatch } from '@services/hooks';
+import {
+  clearAuthError,
+  selectAuthError,
+  selectAuthIsLoading,
+} from '@services/auth/auth-slice';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { isResetPasswordAllowed, setResetPasswordAllowed } from '@utils/auth';
 import { ROUTES } from '@utils/constants';
 
@@ -18,45 +23,31 @@ import styles from '../auth/auth-form.module.css';
 export const ResetPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const error = useAppSelector(selectAuthError);
+  const isLoading = useAppSelector(selectAuthIsLoading);
+  const { values, handleChange } = useForm({
+    password: '',
+    token: '',
+  });
 
-  const handlePasswordChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setPassword(event.target.value);
-    },
-    []
-  );
-
-  const handleTokenChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
-      setToken(event.target.value);
-    },
-    []
-  );
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>): void => {
       event.preventDefault();
-      setError(null);
-      setIsLoading(true);
 
-      void dispatch(resetPassword({ password, token }))
-        .unwrap()
-        .then((): void => {
-          setResetPasswordAllowed(false);
-          void navigate(ROUTES.LOGIN);
-        })
-        .catch((message: string): void => {
-          setError(message);
-        })
-        .finally((): void => {
-          setIsLoading(false);
-        });
+      void dispatch(resetPassword(values)).then((result): void => {
+        if (!resetPassword.fulfilled.match(result)) {
+          return;
+        }
+
+        setResetPasswordAllowed(false);
+        void navigate(ROUTES.LOGIN);
+      });
     },
-    [dispatch, navigate, password, token]
+    [dispatch, navigate, values]
   );
 
   if (!isResetPasswordAllowed()) {
@@ -65,24 +56,26 @@ export const ResetPasswordPage = (): React.JSX.Element => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={`${styles.title} text text_type_main-medium`}>
+      <h1 className={`${styles.title} text text_type_main-medium mb-6`}>
         Восстановление пароля
       </h1>
-      {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+      {error && (
+        <p className={`${styles.error} text text_type_main-default mb-6`}>{error}</p>
+      )}
       <PasswordInput
         extraClass="mb-6"
         name="password"
-        onChange={handlePasswordChange}
+        onChange={handleChange}
         placeholder="Введите новый пароль"
-        value={password}
+        value={values.password}
       />
       <Input
         extraClass="mb-6"
         name="token"
-        onChange={handleTokenChange}
+        onChange={handleChange}
         placeholder="Введите код из письма"
         type="text"
-        value={token}
+        value={values.token}
       />
       <Button disabled={isLoading} htmlType="submit" size="medium" type="primary">
         Сохранить

@@ -1,0 +1,24 @@
+.page {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 80px 16px 40px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 640px;
+}
+
+.status {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 240px;
+  margin: 0;
+  text-align: center;
+}
